@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(sudo apt-get update:*)",
+      "Bash(sudo apt-get install:*)",
+      "Bash(node --version:*)",
+      "Bash(npx --version:*)",
+      "Bash(npm init:*)",
+      "Bash(npm install:*)",
+      "Bash(node execute-schema.mjs:*)",
+      "Bash(getent:*)",
+      "Bash(nslookup:*)",
+      "Bash(host:*)",
+      "Bash(dig +short:*)",
+      "Bash(NODE_OPTIONS='--dns-result-order=ipv4first' node:*)",
+      "Bash(curl:*)",
+      "Bash(xclip:*)",
+      "Bash(clip.exe)",
+      "Bash(sudo npm i:*)",
+      "Bash(export PATH=~/.npm-global/bin:$PATH)",
+      "Bash(npm i:*)",
+      "Bash(claude --version)",
+      "Bash(find:*)",
+      "Bash(while IFS= read -r file)",
+      "Bash(done)",
+      "Bash(ssh root@217.196.51.139:*)"
+    ]
+  }
+}
