@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Requirements | SirSote</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --accent: #00ff88;
+            --accent-dim: rgba(0, 255, 136, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --border: #2a2a2a;
+            --error: #ff4444;
+            --warning: #ffaa00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .form-header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .form-header h1 span {
+            color: var(--accent);
+        }
+
+        .form-header p {
+            color: var(--text-secondary);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: sticky;
+            top: 0;
+            background: var(--bg-primary);
+            padding: 15px 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--bg-tertiary);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Sections */
+        .form-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-number {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-dim);
+            border: 1px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--accent);
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .section-required {
+            margin-left: auto;
+            font-size: 11px;
+            padding: 4px 8px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* Form Fields */
+        .field-group {
+            margin-bottom: 25px;
+        }
+
+        .field-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .field-label .required {
+            color: var(--accent);
+            margin-left: 4px;
+        }
+
+        .field-help {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="url"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: var(--text-secondary);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        /* Checkbox & Radio Groups */
+        .checkbox-group,
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .checkbox-item:hover,
+        .radio-item:hover {
+            border-color: var(--accent);
+        }
+
+        .checkbox-item.selected,
+        .radio-item.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .checkbox-item input,
+        .radio-item input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+
+        /* Expandable Categories */
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .category-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .category-card.expanded {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent-dim);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .category-header:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .category-checkbox {
+            width: 22px;
+            height: 22px;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .category-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-dim);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .category-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .category-label {
+            font-weight: 600;
+            font-size: 15px;
+            margin-bottom: 2px;
+        }
+
+        .category-description {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .category-expand {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .category-card.expanded .category-expand {
+            transform: rotate(180deg);
+        }
+
+        .category-options {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: var(--bg-secondary);
+        }
+
+        .category-card.expanded .category-options {
+            max-height: 1000px;
+        }
+
+        .category-options-inner {
+            padding: 0 16px 16px;
+        }
+
+        .option-group {
+            margin-bottom: 16px;
+        }
+
+        .option-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .option-group-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+
+        .option-group:first-child .option-group-label {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .option-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .option-item:hover {
+            border-color: var(--accent);
+        }
+
+        .option-item.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .option-item input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--accent);
+        }
+
+        .category-count {
+            font-size: 11px;
+            padding: 2px 8px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 10px;
+            font-weight: 600;
+            margin-left: auto;
+            display: none;
+        }
+
+        .category-card.has-selections .category-count {
+            display: inline-block;
+        }
+
+        /* Repeater Fields */
+        .repeater {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .repeater-item {
+            display: flex;
+            gap: 10px;
+        }
+
+        .repeater-item input {
+            flex: 1;
+        }
+
+        .repeater-remove {
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .repeater-remove:hover {
+            border-color: var(--error);
+            color: var(--error);
+        }
+
+        .repeater-add {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: transparent;
+            border: 1px dashed var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .repeater-add:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Requirements Table */
+        .requirements-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .requirements-table th {
+            text-align: left;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .requirements-table td {
+            padding: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .requirements-table input,
+        .requirements-table select {
+            border: none;
+            background: transparent;
+            padding: 8px;
+        }
+
+        .requirements-table input:focus,
+        .requirements-table select:focus {
+            box-shadow: none;
+        }
+
+        .priority-select {
+            padding: 6px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        .priority-must { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
+        .priority-should { background: rgba(0, 136, 255, 0.2); color: #0088ff; }
+        .priority-could { background: rgba(255, 170, 0, 0.2); color: #ffaa00; }
+        .priority-wont { background: rgba(136, 136, 136, 0.2); color: #888888; }
+
+        /* Two Column Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px var(--accent-dim);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Form Actions */
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            padding: 30px 0;
+            border-top: 1px solid var(--border);
+            margin-top: 20px;
+        }
+
+        .form-actions-left {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* Auto-save Indicator */
+        .autosave-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+        }
+
+        .autosave-indicator.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .autosave-indicator.saved {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* Conditional Sections */
+        .conditional-section {
+            display: none;
+        }
+
+        .conditional-section.visible {
+            display: block;
+        }
+
+        /* Validation States */
+        .field-error input,
+        .field-error textarea,
+        .field-error select {
+            border-color: var(--error);
+        }
+
+        .error-message {
+            color: var(--error);
+            font-size: 12px;
+            margin-top: 6px;
+        }
+
+        /* Pre-filled indicator */
+        .prefilled {
+            position: relative;
+        }
+
+        .prefilled::after {
+            content: 'from chat';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 10px;
+            color: var(--accent);
+            background: var(--accent-dim);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Loading State */
+        .loading {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--bg-primary);
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success State */
+        .success-message {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-dim);
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+        }
+
+        .success-message h2 {
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="form-header">
+            <h1>Project <span>Requirements</span></h1>
+            <p>Formalize your project details for accurate scoping</p>
+        </header>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text">
+                <span id="progressText">Section 1 of 9</span> &bull;
+                <span id="progressPercent">0%</span> complete
+            </div>
+        </div>
+
+        <form id="brdForm">
+            <!-- Section 1: Executive Summary -->
+            <section class="form-section" data-section="1">
+                <div class="section-header">
+                    <div class="section-number">1</div>
+                    <h2 class="section-title">Executive Summary</h2>
+                    <span class="section-required">REQUIRED</span>
+                </div>
+                <p class="section-description">High-level overview of your project</p>
+
+                <div class="field-group">
+                    <label class="field-label">
+                        Project Title <span class="required">*</span>
+                    </label>
+                    <input type="text" name="project_title" required
+                           placeholder="e.g., Customer Portal Automation"
+                           maxlength="100">
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">
+                        One-Line Description <span class="required">*</span>
+                    </label>
+                    <input type="text" name="one_liner" required
+                           placeholder="Describe your project in one sentence"
+                           maxlength="200">
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">
+                        Problem Statement <span class="required">*</span>
+                    </label>
+                    <textarea name="problem_statement" required
+                              placeholder="What problem does this project solve?"
+                              rows="3"></textarea>
+                    <p class="field-help">Describe the pain point or opportunity this addresses</p>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Proposed Solution</label>
+                    <textarea name="proposed_solution"
+                              placeholder="How do you envision solving this problem?"
+                              rows="3"></textarea>
+                </div>
+            </section>
+
+            <!-- Section 2: Project Objectives -->
+            <section class="form-section" data-section="2">
+                <div class="section-header">
+                    <div class="section-number">2</div>
+                    <h2 class="section-title">Project Objectives</h2>
+                    <span class="section-required">REQUIRED</span>
+                </div>
+                <p class="section-description">Define SMART goals: Specific, Measurable, Achievable, Relevant, Time-bound</p>
+
+                <div class="field-group">
+                    <label class="field-label">
+                        Primary Objective <span class="required">*</span>
+                    </label>
+                    <textarea name="primary_objective" required
+                              placeholder="What is the main goal? (Be specific and measurable)"
+                              rows="2"></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Secondary Objectives</label>
+                    <div class="repeater" id="secondaryObjectives">
+                        <div class="repeater-item">
+                            <input type="text" name="secondary_objectives[]" placeholder="Additional goal">
+                            <button type="button" class="repeater-remove" onclick="removeRepeaterItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="repeater-add" onclick="addRepeaterItem('secondaryObjectives', 'secondary_objectives[]', 'Additional goal')">
+                        + Add another objective
+                    </button>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">
+                        Success Metrics <span class="required">*</span>
+                    </label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="success_metrics[]" value="time_saved">
+                            <span>Time saved (hours/week)</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="success_metrics[]" value="cost_reduction">
+                            <span>Cost reduction ($)</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="success_metrics[]" value="revenue_increase">
+                            <span>Revenue increase ($)</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="success_metrics[]" value="error_reduction">
+                            <span>Error reduction (%)</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="success_metrics[]" value="customer_satisfaction">
+                            <span>Customer satisfaction</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="success_metrics[]" value="throughput">
+                            <span>Increased throughput</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Target Numbers</label>
+                    <textarea name="target_numbers"
+                              placeholder="e.g., Save 10 hours/week, Reduce errors by 50%"
+                              rows="2"></textarea>
+                    <p class="field-help">Quantify your success metrics where possible</p>
+                </div>
+            </section>
+
+            <!-- Section 3: Project Scope -->
+            <section class="form-section" data-section="3">
+                <div class="section-header">
+                    <div class="section-number">3</div>
+                    <h2 class="section-title">Project Scope</h2>
+                    <span class="section-required">REQUIRED</span>
+                </div>
+                <p class="section-description">Define boundaries and deliverables</p>
+
+                <div class="field-group">
+                    <label class="field-label">
+                        What's Included (In Scope) <span class="required">*</span>
+                    </label>
+                    <div class="repeater" id="inScope">
+                        <div class="repeater-item">
+                            <input type="text" name="in_scope[]" placeholder="Add item that IS part of this project" required>
+                            <button type="button" class="repeater-remove" onclick="removeRepeaterItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="repeater-add" onclick="addRepeaterItem('inScope', 'in_scope[]', 'Add item that IS part of this project')">
+                        + Add item
+                    </button>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">What's NOT Included (Out of Scope)</label>
+                    <div class="repeater" id="outOfScope">
+                        <div class="repeater-item">
+                            <input type="text" name="out_of_scope[]" placeholder="Add item explicitly EXCLUDED">
+                            <button type="button" class="repeater-remove" onclick="removeRepeaterItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="repeater-add" onclick="addRepeaterItem('outOfScope', 'out_of_scope[]', 'Add item explicitly EXCLUDED')">
+                        + Add exclusion
+                    </button>
+                    <p class="field-help">Defining exclusions prevents scope creep</p>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">
+                        Expected Deliverables <span class="required">*</span>
+                    </label>
+                    <div class="repeater" id="deliverables">
+                        <div class="repeater-item">
+                            <input type="text" name="deliverables[]" placeholder="What tangible output do you expect?" required>
+                            <button type="button" class="repeater-remove" onclick="removeRepeaterItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="repeater-add" onclick="addRepeaterItem('deliverables', 'deliverables[]', 'What tangible output do you expect?')">
+                        + Add deliverable
+                    </button>
+                </div>
+            </section>
+
+            <!-- Section 4: Requirements -->
+            <section class="form-section" data-section="4">
+                <div class="section-header">
+                    <div class="section-number">4</div>
+                    <h2 class="section-title">Requirements</h2>
+                    <span class="section-required">REQUIRED</span>
+                </div>
+                <p class="section-description">Functional and technical requirements</p>
+
+                <div class="field-group">
+                    <label class="field-label">
+                        Functional Requirements <span class="required">*</span>
+                    </label>
+                    <p class="field-help" style="margin-bottom: 15px;">What must the solution DO? Use MoSCoW prioritization.</p>
+                    <table class="requirements-table" id="requirementsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%;">Requirement</th>
+                                <th style="width: 25%;">Priority</th>
+                                <th style="width: 25%;">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type="text" name="requirements[0][text]" placeholder="Describe requirement" required></td>
+                                <td>
+                                    <select name="requirements[0][priority]" class="priority-select">
+                                        <option value="must">Must Have</option>
+                                        <option value="should">Should Have</option>
+                                        <option value="could">Could Have</option>
+                                        <option value="wont">Won't Have</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" name="requirements[0][notes]" placeholder="Optional"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button type="button" class="repeater-add" onclick="addRequirementRow()" style="margin-top: 10px;">
+                        + Add requirement
+                    </button>
+                </div>
+
+                <!-- Expandable Integration Categories -->
+                <div class="field-group">
+                    <label class="field-label">Required Integrations</label>
+                    <p class="field-hint" style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px;">Select categories to reveal specific options</p>
+
+                    <div class="category-list" id="integrationCategories">
+                        <!-- Core Business Systems -->
+                        <div class="category-card" data-category="core">
+                            <div class="category-header" onclick="toggleCategory(this)">
+                                <input type="checkbox" class="category-checkbox" name="integrations[core][selected]" value="1" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                                <div class="category-icon">&#128188;</div>
+                                <div class="category-info">
+                                    <div class="category-label">Core Business Systems</div>
+                                    <div class="category-description">CRM, email, communication, productivity</div>
+                                </div>
+                                <span class="category-count">0</span>
+                                <div class="category-expand">&#9660;</div>
+                            </div>
+                            <div class="category-options">
+                                <div class="category-options-inner">
+                                    <div class="option-group">
+                                        <div class="option-group-label">CRM</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][crm][]" value="salesforce"><span>Salesforce</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][crm][]" value="hubspot"><span>HubSpot</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][crm][]" value="pipedrive"><span>Pipedrive</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][crm][]" value="other"><span>Other CRM</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Email & Calendar</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][email][]" value="gmail"><span>Gmail / Google</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][email][]" value="outlook"><span>Outlook / M365</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][email][]" value="calendar"><span>Calendar</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Communication</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][comm][]" value="slack"><span>Slack</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][comm][]" value="teams"><span>Microsoft Teams</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Productivity & Data</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][prod][]" value="sheets"><span>Google Sheets</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][prod][]" value="excel"><span>Excel / OneDrive</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][prod][]" value="airtable"><span>Airtable</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][prod][]" value="notion"><span>Notion</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][prod][]" value="database"><span>Database</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Commerce & Finance</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][commerce][]" value="shopify"><span>Shopify</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][commerce][]" value="woo"><span>WooCommerce</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][commerce][]" value="stripe"><span>Stripe</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[core][commerce][]" value="accounting"><span>QuickBooks/Xero</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI & Intelligent Systems -->
+                        <div class="category-card" data-category="ai">
+                            <div class="category-header" onclick="toggleCategory(this)">
+                                <input type="checkbox" class="category-checkbox" name="integrations[ai][selected]" value="1" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                                <div class="category-icon">&#129504;</div>
+                                <div class="category-info">
+                                    <div class="category-label">AI & Intelligent Systems</div>
+                                    <div class="category-description">Chatbots, automation, knowledge systems</div>
+                                </div>
+                                <span class="category-count">0</span>
+                                <div class="category-expand">&#9660;</div>
+                            </div>
+                            <div class="category-options">
+                                <div class="category-options-inner">
+                                    <div class="option-group">
+                                        <div class="option-group-label">AI Chatbots</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][chatbots][]" value="internal"><span>Internal (Team)</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][chatbots][]" value="customer"><span>Customer-Facing</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][chatbots][]" value="support"><span>Support / Triage</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Knowledge & Content</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][knowledge][]" value="rag"><span>Knowledge Base / RAG</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][knowledge][]" value="content_gen"><span>Content Generation</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][knowledge][]" value="moderation"><span>Content Moderation</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">AI Automation</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][automation][]" value="workflow"><span>Workflow Automation</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][automation][]" value="email_crm"><span>Email & CRM</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][automation][]" value="data_analysis"><span>Data Analysis</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Specialized AI</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][specialized][]" value="seo"><span>AI SEO</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][specialized][]" value="voice"><span>Voice / Speech</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][specialized][]" value="image"><span>Image Processing</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[ai][specialized][]" value="custom_llm"><span>Custom LLM / Agent</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Security & Compliance -->
+                        <div class="category-card" data-category="security">
+                            <div class="category-header" onclick="toggleCategory(this)">
+                                <input type="checkbox" class="category-checkbox" name="integrations[security][selected]" value="1" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                                <div class="category-icon">&#128737;</div>
+                                <div class="category-info">
+                                    <div class="category-label">Security & Compliance</div>
+                                    <div class="category-description">Monitoring, protection, regulatory compliance</div>
+                                </div>
+                                <span class="category-count">0</span>
+                                <div class="category-expand">&#9660;</div>
+                            </div>
+                            <div class="category-options">
+                                <div class="category-options-inner">
+                                    <div class="option-group">
+                                        <div class="option-group-label">Security Operations</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][ops][]" value="monitoring"><span>Monitoring & Alerts</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][ops][]" value="vuln"><span>Vulnerability Scanning</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][ops][]" value="siem"><span>SIEM / Log Aggregation</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][ops][]" value="api"><span>API Security</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Access & Protection</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][access][]" value="iam"><span>IAM</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][access][]" value="encryption"><span>Encryption & Secrets</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][access][]" value="backup"><span>Backup & DR</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Compliance Frameworks</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][compliance][]" value="soc2"><span>SOC 2</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][compliance][]" value="hipaa"><span>HIPAA</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][compliance][]" value="gdpr"><span>GDPR</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[security][compliance][]" value="pci"><span>PCI-DSS</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Growth & Marketing -->
+                        <div class="category-card" data-category="growth">
+                            <div class="category-header" onclick="toggleCategory(this)">
+                                <input type="checkbox" class="category-checkbox" name="integrations[growth][selected]" value="1" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                                <div class="category-icon">&#128200;</div>
+                                <div class="category-info">
+                                    <div class="category-label">Growth & Marketing</div>
+                                    <div class="category-description">Analytics, advertising, SEO, marketing automation</div>
+                                </div>
+                                <span class="category-count">0</span>
+                                <div class="category-expand">&#9660;</div>
+                            </div>
+                            <div class="category-options">
+                                <div class="category-options-inner">
+                                    <div class="option-group">
+                                        <div class="option-group-label">Analytics & Tracking</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][analytics][]" value="ga"><span>Google Analytics</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][analytics][]" value="mixpanel"><span>Mixpanel / Amplitude</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][analytics][]" value="heatmaps"><span>Heatmaps / Replay</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">SEO & Optimization</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][seo][]" value="platforms"><span>SEO Platforms</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][seo][]" value="ai_seo"><span>AI SEO Tools</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][seo][]" value="ab_testing"><span>A/B Testing</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Advertising</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][ads][]" value="google"><span>Google Ads</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][ads][]" value="meta"><span>Meta Ads</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][ads][]" value="linkedin"><span>LinkedIn Ads</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][ads][]" value="tiktok"><span>TikTok Ads</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Outreach</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][outreach][]" value="email"><span>Email Marketing</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[growth][outreach][]" value="social"><span>Social Media Mgmt</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Infrastructure & DevOps -->
+                        <div class="category-card" data-category="infrastructure">
+                            <div class="category-header" onclick="toggleCategory(this)">
+                                <input type="checkbox" class="category-checkbox" name="integrations[infrastructure][selected]" value="1" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                                <div class="category-icon">&#9881;</div>
+                                <div class="category-info">
+                                    <div class="category-label">Infrastructure & DevOps</div>
+                                    <div class="category-description">Cloud, deployment, containers, CI/CD</div>
+                                </div>
+                                <span class="category-count">0</span>
+                                <div class="category-expand">&#9660;</div>
+                            </div>
+                            <div class="category-options">
+                                <div class="category-options-inner">
+                                    <div class="option-group">
+                                        <div class="option-group-label">Cloud Providers</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][cloud][]" value="aws"><span>AWS</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][cloud][]" value="azure"><span>Azure</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][cloud][]" value="gcp"><span>GCP</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][cloud][]" value="selfhost"><span>Self-Hosted</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">DevOps & Deployment</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][devops][]" value="cicd"><span>CI/CD Pipelines</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][devops][]" value="docker"><span>Docker</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][devops][]" value="k8s"><span>Kubernetes</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][devops][]" value="secrets"><span>Secrets Mgmt</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Operations</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][ops][]" value="monitoring"><span>Monitoring</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][ops][]" value="cdn"><span>CDN / Edge</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[infrastructure][ops][]" value="dns"><span>DNS Management</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Data & Intelligence -->
+                        <div class="category-card" data-category="data">
+                            <div class="category-header" onclick="toggleCategory(this)">
+                                <input type="checkbox" class="category-checkbox" name="integrations[data][selected]" value="1" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                                <div class="category-icon">&#128202;</div>
+                                <div class="category-info">
+                                    <div class="category-label">Data & Intelligence</div>
+                                    <div class="category-description">Warehousing, BI, pipelines, analytics</div>
+                                </div>
+                                <span class="category-count">0</span>
+                                <div class="category-expand">&#9660;</div>
+                            </div>
+                            <div class="category-options">
+                                <div class="category-options-inner">
+                                    <div class="option-group">
+                                        <div class="option-group-label">Data Storage</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[data][storage][]" value="warehouse"><span>Data Warehouse</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[data][storage][]" value="lake"><span>Data Lake</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Data Processing</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[data][processing][]" value="etl"><span>ETL / ELT Pipelines</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[data][processing][]" value="realtime"><span>Real-Time Processing</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[data][processing][]" value="events"><span>Event Tracking</span></label>
+                                        </div>
+                                    </div>
+                                    <div class="option-group">
+                                        <div class="option-group-label">Visualization</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[data][viz][]" value="bi"><span>BI Tools</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[data][viz][]" value="dashboards"><span>Custom Dashboards</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[data][viz][]" value="predictive"><span>Predictive Analytics</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Custom / Other -->
+                        <div class="category-card" data-category="custom">
+                            <div class="category-header" onclick="toggleCategory(this)">
+                                <input type="checkbox" class="category-checkbox" name="integrations[custom][selected]" value="1" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                                <div class="category-icon">&#128295;</div>
+                                <div class="category-info">
+                                    <div class="category-label">Custom / Other</div>
+                                    <div class="category-description">APIs and integrations not listed above</div>
+                                </div>
+                                <span class="category-count">0</span>
+                                <div class="category-expand">&#9660;</div>
+                            </div>
+                            <div class="category-options">
+                                <div class="category-options-inner">
+                                    <div class="option-group">
+                                        <div class="option-group-label">Custom Integrations</div>
+                                        <div class="option-list">
+                                            <label class="option-item"><input type="checkbox" name="integrations[custom][type][]" value="api"><span>Custom API</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[custom][type][]" value="legacy"><span>Legacy System</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[custom][type][]" value="internal"><span>Internal Tools</span></label>
+                                            <label class="option-item"><input type="checkbox" name="integrations[custom][type][]" value="third_party"><span>Third-Party Platform</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group" id="integrationDetailsGroup" style="display: none;">
+                    <label class="field-label">Integration Details</label>
+                    <textarea name="integration_details"
+                              placeholder="Specify which systems, API access available, and how they should connect"
+                              rows="4"></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Non-Functional Requirements</label>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="non_functional[]" value="performance">
+                            <span>Performance</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="non_functional[]" value="security">
+                            <span>Security</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="non_functional[]" value="scalability">
+                            <span>Scalability</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="non_functional[]" value="availability">
+                            <span>High Availability</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="non_functional[]" value="compliance">
+                            <span>Compliance</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="non_functional[]" value="mobile">
+                            <span>Mobile Access</span>
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Stakeholders -->
+            <section class="form-section" data-section="5">
+                <div class="section-header">
+                    <div class="section-number">5</div>
+                    <h2 class="section-title">Stakeholders</h2>
+                    <span class="section-required">REQUIRED</span>
+                </div>
+                <p class="section-description">Who is involved in this project?</p>
+
+                <div class="field-group">
+                    <label class="field-label">Project Owner / Decision Maker</label>
+                    <div class="two-column">
+                        <div>
+                            <input type="text" name="owner_name" placeholder="Name *" required>
+                        </div>
+                        <div>
+                            <input type="text" name="owner_role" placeholder="Role/Title">
+                        </div>
+                        <div>
+                            <input type="email" name="owner_email" placeholder="Email *" required>
+                        </div>
+                        <div>
+                            <input type="tel" name="owner_phone" placeholder="Phone (optional)">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">End Users</label>
+                    <textarea name="end_users"
+                              placeholder="Who will use this solution? (role, count, technical level)"
+                              rows="2"></textarea>
+                </div>
+            </section>
+
+            <!-- Section 6: Constraints -->
+            <section class="form-section" data-section="6">
+                <div class="section-header">
+                    <div class="section-number">6</div>
+                    <h2 class="section-title">Constraints & Assumptions</h2>
+                </div>
+                <p class="section-description">Limitations, dependencies, and assumptions</p>
+
+                <div class="two-column">
+                    <div class="field-group">
+                        <label class="field-label">Budget Range <span class="required">*</span></label>
+                        <select name="budget_range" required>
+                            <option value="">Select budget range</option>
+                            <option value="under_1k">Under $1,000</option>
+                            <option value="1k_5k">$1,000 - $5,000</option>
+                            <option value="5k_10k">$5,000 - $10,000</option>
+                            <option value="10k_25k">$10,000 - $25,000</option>
+                            <option value="25k_50k">$25,000 - $50,000</option>
+                            <option value="50k_plus">$50,000+</option>
+                            <option value="tbd">To Be Determined</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label">Budget Flexibility</label>
+                        <select name="budget_flexibility">
+                            <option value="">Select flexibility</option>
+                            <option value="fixed">Fixed - Cannot exceed</option>
+                            <option value="flexible">Flexible - Some room</option>
+                            <option value="open">Open - Value over cost</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="two-column">
+                    <div class="field-group">
+                        <label class="field-label">Desired Timeline <span class="required">*</span></label>
+                        <select name="timeline" required>
+                            <option value="">Select timeline</option>
+                            <option value="asap">ASAP / Urgent</option>
+                            <option value="1_2_weeks">1-2 weeks</option>
+                            <option value="2_4_weeks">2-4 weeks</option>
+                            <option value="1_2_months">1-2 months</option>
+                            <option value="3_6_months">3-6 months</option>
+                            <option value="flexible">Flexible / No rush</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label class="field-label">Hard Deadline (if any)</label>
+                        <input type="date" name="hard_deadline">
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Technical Constraints</label>
+                    <textarea name="technical_constraints"
+                              placeholder="Any technical limitations? (platforms, languages, hosting)"
+                              rows="2"></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Assumptions</label>
+                    <div class="repeater" id="assumptions">
+                        <div class="repeater-item">
+                            <input type="text" name="assumptions[]" placeholder="What are you assuming to be true?">
+                            <button type="button" class="repeater-remove" onclick="removeRepeaterItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="repeater-add" onclick="addRepeaterItem('assumptions', 'assumptions[]', 'What are you assuming to be true?')">
+                        + Add assumption
+                    </button>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Known Risks</label>
+                    <div class="repeater" id="risks">
+                        <div class="repeater-item">
+                            <input type="text" name="risks[]" placeholder="What could go wrong?">
+                            <button type="button" class="repeater-remove" onclick="removeRepeaterItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="repeater-add" onclick="addRepeaterItem('risks', 'risks[]', 'What could go wrong?')">
+                        + Add risk
+                    </button>
+                </div>
+            </section>
+
+            <!-- Section 7: Current State -->
+            <section class="form-section" data-section="7">
+                <div class="section-header">
+                    <div class="section-number">7</div>
+                    <h2 class="section-title">Current State</h2>
+                </div>
+                <p class="section-description">How are things done today?</p>
+
+                <div class="field-group">
+                    <label class="field-label">Current Process</label>
+                    <textarea name="current_process"
+                              placeholder="Describe how this is handled today (even if manual)"
+                              rows="4"></textarea>
+                    <p class="field-help">Understanding the current state helps design the future state</p>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Current Pain Points</label>
+                    <div class="repeater" id="painPoints">
+                        <div class="repeater-item">
+                            <input type="text" name="pain_points[]" placeholder="What's frustrating about the current process?">
+                            <button type="button" class="repeater-remove" onclick="removeRepeaterItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="repeater-add" onclick="addRepeaterItem('painPoints', 'pain_points[]', 'What\\'s frustrating about the current process?')">
+                        + Add pain point
+                    </button>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Existing Tools/Systems</label>
+                    <textarea name="existing_tools"
+                              placeholder="What tools are currently being used?"
+                              rows="2"></textarea>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label">Current Volume/Scale</label>
+                    <textarea name="volume_metrics"
+                              placeholder="e.g., 100 orders/day, 50 emails/week, 10 team members"
+                              rows="2"></textarea>
+                    <p class="field-help">Helps scope the solution appropriately</p>
+                </div>
+            </section>
+
+            <!-- Section 8: Clarifications -->
+            <section class="form-section conditional-section" data-section="8" id="clarificationsSection">
+                <div class="section-header">
+                    <div class="section-number">8</div>
+                    <h2 class="section-title">Clarifications from Chat</h2>
+                </div>
+                <p class="section-description">Questions raised during your conversation with SirSote-Echo</p>
+
+                <div class="field-group">
+                    <label class="field-label">Additional Context</label>
+                    <textarea name="additional_context"
+                              placeholder="Anything else we should know that wasn't covered in chat?"
+                              rows="4"></textarea>
+                </div>
+            </section>
+
+            <!-- Section 9: Attachments -->
+            <section class="form-section" data-section="9">
+                <div class="section-header">
+                    <div class="section-number">9</div>
+                    <h2 class="section-title">Supporting Documents</h2>
+                </div>
+                <p class="section-description">Upload relevant files (optional)</p>
+
+                <div class="field-group">
+                    <label class="field-label">Reference Links</label>
+                    <div class="repeater" id="referenceLinks">
+                        <div class="repeater-item">
+                            <input type="url" name="reference_links[]" placeholder="https://example.com">
+                            <button type="button" class="repeater-remove" onclick="removeRepeaterItem(this)">&times;</button>
+                        </div>
+                    </div>
+                    <button type="button" class="repeater-add" onclick="addRepeaterItem('referenceLinks', 'reference_links[]', 'https://example.com')">
+                        + Add link
+                    </button>
+                    <p class="field-help">Links to examples, competitors, inspiration</p>
+                </div>
+            </section>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <div class="form-actions-left">
+                    <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                        Save Draft
+                    </button>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    Submit Requirements
+                </button>
+            </div>
+        </form>
+
+        <!-- Success Message (Hidden) -->
+        <div id="successMessage" style="display: none;">
+            <div class="success-message">
+                <div class="success-icon">&#10003;</div>
+                <h2>Requirements Submitted</h2>
+                <p>We've received your project requirements and will be in touch soon.</p>
+                <p style="margin-top: 20px;">
+                    <strong>Reference ID:</strong> <code id="submissionId"></code>
+                </p>
+                <button class="btn btn-primary" style="margin-top: 30px;" onclick="window.location.href='/'">
+                    Return to Homepage
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auto-save Indicator -->
+    <div class="autosave-indicator" id="autosaveIndicator">
+        Draft saved
+    </div>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            submitUrl: 'https://sirsote.com/api/brd',
+            autoSaveInterval: 30000,
+            storageKey: 'sirsote_brd_draft'
+        };
+
+        let requirementRowCount = 1;
+        let autoSaveTimer;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDraft();
+            setupAutoSave();
+            setupProgressTracking();
+            setupCheckboxHighlighting();
+            setupPriorityColors();
+            setupExpandableCategories();
+
+            // Check for prefill data from URL params
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('intake')) {
+                prefillFromIntake(params.get('intake'));
+            }
+        });
+
+        // Form Submission
+        document.getElementById('brdForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const form = e.target;
+            const submitBtn = form.querySelector('[type="submit"]');
+
+            // Validate
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Loading state
+            submitBtn.classList.add('loading');
+            submitBtn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+            try {
+                const formData = new FormData(form);
+                const data = formDataToObject(formData);
+                data.submittedAt = new Date().toISOString();
+                data.source = 'web_form';
+
+                const response = await fetch(CONFIG.submitUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-API-Key': 'YOUR_API_KEY' // Replace with actual key
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) throw new Error('Submission failed');
+
+                const result = await response.json();
+
+                // Clear draft
+                localStorage.removeItem(CONFIG.storageKey);
+
+                // Show success
+                document.getElementById('brdForm').style.display = 'none';
+                document.querySelector('.progress-container').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('submissionId').textContent = result.brdId || 'BRD-' + Date.now();
+
+            } catch (error) {
+                console.error('Submission error:', error);
+                alert('There was an error submitting your requirements. Please try again.');
+                submitBtn.classList.remove('loading');
+                submitBtn.innerHTML = 'Submit Requirements';
+            }
+        });
+
+        // Repeater Functions
+        function addRepeaterItem(containerId, name, placeholder) {
+            const container = document.getElementById(containerId);
+            const item = document.createElement('div');
+            item.className = 'repeater-item';
+            item.innerHTML = `
+                <input type="text" name="${name}" placeholder="${placeholder}">
+                <button type="button" class="repeater-remove" onclick="removeRepeaterItem(this)">&times;</button>
+            `;
+            container.appendChild(item);
+        }
+
+        function removeRepeaterItem(button) {
+            const container = button.parentElement.parentElement;
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            }
+        }
+
+        // Requirements Table
+        function addRequirementRow() {
+            const tbody = document.querySelector('#requirementsTable tbody');
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><input type="text" name="requirements[${requirementRowCount}][text]" placeholder="Describe requirement"></td>
+                <td>
+                    <select name="requirements[${requirementRowCount}][priority]" class="priority-select" onchange="updatePriorityColor(this)">
+                        <option value="must">Must Have</option>
+                        <option value="should">Should Have</option>
+                        <option value="could">Could Have</option>
+                        <option value="wont">Won't Have</option>
+                    </select>
+                </td>
+                <td><input type="text" name="requirements[${requirementRowCount}][notes]" placeholder="Optional"></td>
+            `;
+            tbody.appendChild(row);
+            requirementRowCount++;
+        }
+
+        function updatePriorityColor(select) {
+            select.className = 'priority-select priority-' + select.value;
+        }
+
+        function setupPriorityColors() {
+            document.querySelectorAll('.priority-select').forEach(select => {
+                updatePriorityColor(select);
+                select.addEventListener('change', () => updatePriorityColor(select));
+            });
+        }
+
+        // Checkbox Highlighting
+        function setupCheckboxHighlighting() {
+            document.querySelectorAll('.checkbox-item input, .radio-item input').forEach(input => {
+                input.addEventListener('change', () => {
+                    input.parentElement.classList.toggle('selected', input.checked);
+                });
+            });
+        }
+
+        // Expandable Category Functions
+        function toggleCategory(header) {
+            const card = header.closest('.category-card');
+            const checkbox = card.querySelector('.category-checkbox');
+            const isExpanded = card.classList.contains('expanded');
+
+            if (isExpanded) {
+                // Collapse
+                card.classList.remove('expanded');
+                checkbox.checked = false;
+            } else {
+                // Expand
+                card.classList.add('expanded');
+                checkbox.checked = true;
+            }
+
+            updateIntegrationDetailsVisibility();
+        }
+
+        function setupExpandableCategories() {
+            // Set up option item highlighting
+            document.querySelectorAll('.option-item input').forEach(input => {
+                input.addEventListener('change', () => {
+                    input.closest('.option-item').classList.toggle('selected', input.checked);
+                    updateCategoryCount(input.closest('.category-card'));
+                    updateIntegrationDetailsVisibility();
+                });
+            });
+
+            // Set up category checkbox behavior
+            document.querySelectorAll('.category-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const card = checkbox.closest('.category-card');
+                    if (checkbox.checked) {
+                        card.classList.add('expanded');
+                    } else {
+                        card.classList.remove('expanded');
+                        // Uncheck all options when category is unchecked
+                        card.querySelectorAll('.option-item input:checked').forEach(opt => {
+                            opt.checked = false;
+                            opt.closest('.option-item').classList.remove('selected');
+                        });
+                        updateCategoryCount(card);
+                    }
+                    updateIntegrationDetailsVisibility();
+                });
+            });
+        }
+
+        function updateCategoryCount(card) {
+            const count = card.querySelectorAll('.option-item input:checked').length;
+            const countEl = card.querySelector('.category-count');
+            countEl.textContent = count;
+
+            if (count > 0) {
+                card.classList.add('has-selections');
+            } else {
+                card.classList.remove('has-selections');
+            }
+        }
+
+        function updateIntegrationDetailsVisibility() {
+            const hasAnySelection = document.querySelectorAll('.category-card.expanded').length > 0 ||
+                                   document.querySelectorAll('.option-item input:checked').length > 0;
+            const detailsGroup = document.getElementById('integrationDetailsGroup');
+            detailsGroup.style.display = hasAnySelection ? 'block' : 'none';
+        }
+
+        // Progress Tracking
+        function setupProgressTracking() {
+            const form = document.getElementById('brdForm');
+            const sections = form.querySelectorAll('.form-section');
+            const totalSections = sections.length;
+
+            form.addEventListener('input', () => {
+                updateProgress();
+            });
+
+            form.addEventListener('change', () => {
+                updateProgress();
+            });
+
+            function updateProgress() {
+                let completedSections = 0;
+
+                sections.forEach((section, index) => {
+                    const requiredFields = section.querySelectorAll('[required]');
+                    const filledRequired = Array.from(requiredFields).filter(f => f.value.trim() !== '').length;
+
+                    if (requiredFields.length === 0 || filledRequired === requiredFields.length) {
+                        completedSections++;
+                    }
+                });
+
+                const percent = Math.round((completedSections / totalSections) * 100);
+                document.getElementById('progressFill').style.width = percent + '%';
+                document.getElementById('progressPercent').textContent = percent + '%';
+
+                // Find current section
+                const scrollPos = window.scrollY + 200;
+                let currentSection = 1;
+                sections.forEach((section, index) => {
+                    if (section.offsetTop <= scrollPos) {
+                        currentSection = index + 1;
+                    }
+                });
+                document.getElementById('progressText').textContent = `Section ${currentSection} of ${totalSections}`;
+            }
+
+            window.addEventListener('scroll', updateProgress);
+            updateProgress();
+        }
+
+        // Auto-save
+        function setupAutoSave() {
+            const form = document.getElementById('brdForm');
+
+            form.addEventListener('input', () => {
+                clearTimeout(autoSaveTimer);
+                autoSaveTimer = setTimeout(saveDraft, CONFIG.autoSaveInterval);
+            });
+        }
+
+        function saveDraft() {
+            const form = document.getElementById('brdForm');
+            const formData = new FormData(form);
+            const data = formDataToObject(formData);
+            data.savedAt = new Date().toISOString();
+
+            localStorage.setItem(CONFIG.storageKey, JSON.stringify(data));
+
+            // Show indicator
+            const indicator = document.getElementById('autosaveIndicator');
+            indicator.classList.add('visible', 'saved');
+            setTimeout(() => {
+                indicator.classList.remove('visible');
+            }, 2000);
+        }
+
+        function loadDraft() {
+            const saved = localStorage.getItem(CONFIG.storageKey);
+            if (!saved) return;
+
+            try {
+                const data = JSON.parse(saved);
+                const form = document.getElementById('brdForm');
+
+                Object.entries(data).forEach(([key, value]) => {
+                    if (key === 'savedAt' || key === 'requirements') return;
+
+                    const field = form.querySelector(`[name="${key}"]`);
+                    if (field) {
+                        if (field.type === 'checkbox') {
+                            field.checked = value.includes(field.value);
+                            if (field.checked) field.parentElement.classList.add('selected');
+                        } else {
+                            field.value = value;
+                        }
+                    }
+                });
+
+                console.log('Draft loaded from', data.savedAt);
+            } catch (e) {
+                console.error('Error loading draft:', e);
+            }
+        }
+
+        // Prefill from Intake
+        async function prefillFromIntake(intakeId) {
+            try {
+                const response = await fetch(`/api/intake/${intakeId}`);
+                if (!response.ok) return;
+
+                const intake = await response.json();
+
+                // Map intake fields to form
+                if (intake.name) document.querySelector('[name="owner_name"]').value = intake.name;
+                if (intake.email) document.querySelector('[name="owner_email"]').value = intake.email;
+                if (intake.company) document.querySelector('[name="owner_role"]').value = intake.company;
+                if (intake.project_type) document.querySelector('[name="project_title"]').value = intake.project_type;
+                if (intake.description) document.querySelector('[name="problem_statement"]').value = intake.description;
+                if (intake.budget) document.querySelector('[name="budget_range"]').value = intake.budget;
+                if (intake.timeline) document.querySelector('[name="timeline"]').value = intake.timeline;
+
+            } catch (e) {
+                console.error('Error prefilling from intake:', e);
+            }
+        }
+
+        // Utility Functions
+        function formDataToObject(formData) {
+            const obj = {};
+
+            formData.forEach((value, key) => {
+                // Handle array fields
+                if (key.endsWith('[]')) {
+                    const cleanKey = key.slice(0, -2);
+                    if (!obj[cleanKey]) obj[cleanKey] = [];
+                    if (value.trim()) obj[cleanKey].push(value);
+                }
+                // Handle nested fields (requirements[0][text])
+                else if (key.includes('[')) {
+                    const matches = key.match(/(\w+)\[(\d+)\]\[(\w+)\]/);
+                    if (matches) {
+                        const [, parent, index, child] = matches;
+                        if (!obj[parent]) obj[parent] = [];
+                        if (!obj[parent][index]) obj[parent][index] = {};
+                        obj[parent][index][child] = value;
+                    }
+                }
+                // Simple fields
+                else {
+                    obj[key] = value;
+                }
+            });
+
+            // Clean up empty requirements
+            if (obj.requirements) {
+                obj.requirements = obj.requirements.filter(r => r && r.text && r.text.trim());
+            }
+
+            return obj;
+        }
+    </script>
+</body>
+</html>

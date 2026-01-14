@@ -346,6 +346,203 @@
             box-shadow: 0 0 30px var(--accent-dim);
         }
 
+        /* Expandable Categories */
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 1rem;
+            width: 100%;
+        }
+
+        .category-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .category-card.expanded {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 1px var(--accent-dim);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .category-header:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .category-checkbox {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .category-icon {
+            width: 28px;
+            height: 28px;
+            background: var(--accent-dim);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .category-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .category-label {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 1px;
+        }
+
+        .category-description {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .category-expand {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            transition: transform 0.2s;
+            flex-shrink: 0;
+            font-size: 12px;
+        }
+
+        .category-card.expanded .category-expand {
+            transform: rotate(180deg);
+        }
+
+        .category-options {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: var(--bg-card);
+        }
+
+        .category-card.expanded .category-options {
+            max-height: 800px;
+        }
+
+        .category-options-inner {
+            padding: 0 14px 14px;
+        }
+
+        .option-group {
+            margin-bottom: 12px;
+        }
+
+        .option-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .option-group-label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--accent);
+            margin-bottom: 6px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+
+        .option-group:first-child .option-group-label {
+            border-top: none;
+            padding-top: 0;
+        }
+
+        .option-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .option-item:hover {
+            border-color: var(--accent);
+        }
+
+        .option-item.selected {
+            border-color: var(--accent);
+            background: var(--accent-dim);
+        }
+
+        .option-item input {
+            width: 14px;
+            height: 14px;
+            accent-color: var(--accent);
+        }
+
+        .category-count {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-radius: 8px;
+            font-weight: 600;
+            margin-left: auto;
+            display: none;
+        }
+
+        .category-card.has-selections .category-count {
+            display: inline-block;
+        }
+
+        .integrations-continue {
+            margin-top: 1rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--accent);
+            color: var(--bg-primary);
+            border: none;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+        }
+
+        .integrations-continue:hover {
+            box-shadow: 0 0 20px var(--accent-dim);
+            transform: translateY(-2px);
+        }
+
         /* Responsive */
         @media (max-width: 600px) {
             .chat-container {
@@ -358,6 +555,19 @@
 
             .options-grid {
                 grid-template-columns: 1fr 1fr;
+            }
+
+            .category-header {
+                padding: 10px 12px;
+            }
+
+            .option-list {
+                gap: 4px;
+            }
+
+            .option-item {
+                padding: 5px 8px;
+                font-size: 11px;
             }
         }
     </style>
@@ -394,7 +604,7 @@
         // =============================================================================
         // N8N WEBHOOK CONFIG
         // =============================================================================
-        const N8N_WEBHOOK_URL = 'https://n8n.sirsote.com/webhook/intake';
+        const N8N_WEBHOOK_URL = 'https://sirsote.com/api/echo';
 
         // =============================================================================
         // CHAT STATE
@@ -445,6 +655,12 @@
                 bot: "Tell me a bit about your project. What are you trying to build or solve?",
                 field: 'description',
                 type: 'textarea'
+            },
+            {
+                id: 'integrations',
+                bot: "What systems or tools do you need to integrate? Select any categories that apply, then pick specific options.",
+                field: 'integrations',
+                type: 'integrations'
             }
         ];
 
@@ -464,7 +680,7 @@
         // =============================================================================
         // CHAT FUNCTIONS
         // =============================================================================
-        function addMessage(content, isUser = false, options = null) {
+        function addMessage(content, isUser = false, options = null, type = null) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
 
@@ -482,9 +698,17 @@
                 html += '</div>';
             }
 
+            if (type === 'integrations') {
+                html += getIntegrationsHTML();
+            }
+
             messageDiv.innerHTML = html;
             messagesEl.appendChild(messageDiv);
             messagesEl.scrollTop = messagesEl.scrollHeight;
+
+            if (type === 'integrations') {
+                setupExpandableCategories();
+            }
         }
 
         function showTyping() {
@@ -524,7 +748,7 @@
             hideTyping();
 
             let botText = typeof q.bot === 'function' ? q.bot(userData) : q.bot;
-            addMessage(botText, false, q.type === 'options' ? q.options : null);
+            addMessage(botText, false, q.type === 'options' ? q.options : null, q.type);
 
             if (q.followUp) {
                 showTyping();
@@ -533,8 +757,8 @@
                 addMessage(q.followUp);
             }
 
-            // Hide text input for option questions
-            if (q.type === 'options') {
+            // Hide text input for option and integration questions
+            if (q.type === 'options' || q.type === 'integrations') {
                 inputArea.style.display = 'none';
             } else {
                 inputArea.style.display = 'block';
@@ -604,6 +828,403 @@
         }
 
         // =============================================================================
+        // EXPANDABLE INTEGRATIONS
+        // =============================================================================
+        function getIntegrationsHTML() {
+            return `
+            <div class="category-list" id="integrationCategories">
+                <!-- Core Business Systems -->
+                <div class="category-card" data-category="core">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <input type="checkbox" class="category-checkbox" data-cat="core" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                        <div class="category-icon">&#128188;</div>
+                        <div class="category-info">
+                            <div class="category-label">Core Business</div>
+                            <div class="category-description">CRM, email, productivity</div>
+                        </div>
+                        <span class="category-count">0</span>
+                        <div class="category-expand">&#9660;</div>
+                    </div>
+                    <div class="category-options">
+                        <div class="category-options-inner">
+                            <div class="option-group">
+                                <div class="option-group-label">CRM</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="salesforce"><span>Salesforce</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="hubspot"><span>HubSpot</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="pipedrive"><span>Pipedrive</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">Email & Calendar</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="gmail"><span>Gmail / Google</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="outlook"><span>Outlook / M365</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="calendar"><span>Calendar</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">Communication</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="slack"><span>Slack</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="teams"><span>Teams</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">Data & Commerce</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="sheets"><span>Google Sheets</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="airtable"><span>Airtable</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="shopify"><span>Shopify</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="core" value="stripe"><span>Stripe</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI & Intelligent Systems -->
+                <div class="category-card" data-category="ai">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <input type="checkbox" class="category-checkbox" data-cat="ai" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                        <div class="category-icon">&#129504;</div>
+                        <div class="category-info">
+                            <div class="category-label">AI & Automation</div>
+                            <div class="category-description">Chatbots, RAG, workflows</div>
+                        </div>
+                        <span class="category-count">0</span>
+                        <div class="category-expand">&#9660;</div>
+                    </div>
+                    <div class="category-options">
+                        <div class="category-options-inner">
+                            <div class="option-group">
+                                <div class="option-group-label">AI Chatbots</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="ai" value="chatbot_internal"><span>Internal (Team)</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="ai" value="chatbot_customer"><span>Customer-Facing</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="ai" value="chatbot_support"><span>Support Triage</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">Knowledge & Content</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="ai" value="rag"><span>Knowledge Base / RAG</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="ai" value="content_gen"><span>Content Generation</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="ai" value="seo_ai"><span>AI SEO</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">Automation</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="ai" value="workflow_auto"><span>Workflow Automation</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="ai" value="data_analysis"><span>Data Analysis</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="ai" value="custom_llm"><span>Custom LLM / Agent</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security & Compliance -->
+                <div class="category-card" data-category="security">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <input type="checkbox" class="category-checkbox" data-cat="security" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                        <div class="category-icon">&#128737;</div>
+                        <div class="category-info">
+                            <div class="category-label">Security & Compliance</div>
+                            <div class="category-description">Monitoring, protection, regulatory</div>
+                        </div>
+                        <span class="category-count">0</span>
+                        <div class="category-expand">&#9660;</div>
+                    </div>
+                    <div class="category-options">
+                        <div class="category-options-inner">
+                            <div class="option-group">
+                                <div class="option-group-label">Security Operations</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="security" value="monitoring"><span>Monitoring & Alerts</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="security" value="vuln_scan"><span>Vulnerability Scanning</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="security" value="siem"><span>SIEM / Logs</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">Compliance</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="security" value="soc2"><span>SOC 2</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="security" value="hipaa"><span>HIPAA</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="security" value="gdpr"><span>GDPR</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="security" value="pci"><span>PCI-DSS</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Growth & Marketing -->
+                <div class="category-card" data-category="growth">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <input type="checkbox" class="category-checkbox" data-cat="growth" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                        <div class="category-icon">&#128200;</div>
+                        <div class="category-info">
+                            <div class="category-label">Growth & Marketing</div>
+                            <div class="category-description">Analytics, ads, SEO</div>
+                        </div>
+                        <span class="category-count">0</span>
+                        <div class="category-expand">&#9660;</div>
+                    </div>
+                    <div class="category-options">
+                        <div class="category-options-inner">
+                            <div class="option-group">
+                                <div class="option-group-label">Analytics</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="growth" value="google_analytics"><span>Google Analytics</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="growth" value="mixpanel"><span>Mixpanel</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="growth" value="heatmaps"><span>Heatmaps</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">Advertising</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="growth" value="google_ads"><span>Google Ads</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="growth" value="meta_ads"><span>Meta Ads</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="growth" value="linkedin_ads"><span>LinkedIn Ads</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">Outreach</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="growth" value="email_marketing"><span>Email Marketing</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="growth" value="social_mgmt"><span>Social Media</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Infrastructure & DevOps -->
+                <div class="category-card" data-category="infrastructure">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <input type="checkbox" class="category-checkbox" data-cat="infrastructure" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                        <div class="category-icon">&#9881;</div>
+                        <div class="category-info">
+                            <div class="category-label">Infrastructure</div>
+                            <div class="category-description">Cloud, DevOps, containers</div>
+                        </div>
+                        <span class="category-count">0</span>
+                        <div class="category-expand">&#9660;</div>
+                    </div>
+                    <div class="category-options">
+                        <div class="category-options-inner">
+                            <div class="option-group">
+                                <div class="option-group-label">Cloud</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="infrastructure" value="aws"><span>AWS</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="infrastructure" value="azure"><span>Azure</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="infrastructure" value="gcp"><span>GCP</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">DevOps</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="infrastructure" value="docker"><span>Docker</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="infrastructure" value="kubernetes"><span>Kubernetes</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="infrastructure" value="cicd"><span>CI/CD</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data & Intelligence -->
+                <div class="category-card" data-category="data">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <input type="checkbox" class="category-checkbox" data-cat="data" onclick="event.stopPropagation(); toggleCategory(this.parentElement)">
+                        <div class="category-icon">&#128202;</div>
+                        <div class="category-info">
+                            <div class="category-label">Data & BI</div>
+                            <div class="category-description">Warehousing, pipelines, dashboards</div>
+                        </div>
+                        <span class="category-count">0</span>
+                        <div class="category-expand">&#9660;</div>
+                    </div>
+                    <div class="category-options">
+                        <div class="category-options-inner">
+                            <div class="option-group">
+                                <div class="option-group-label">Data Storage</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="data" value="warehouse"><span>Data Warehouse</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="data" value="etl"><span>ETL Pipelines</span></label>
+                                </div>
+                            </div>
+                            <div class="option-group">
+                                <div class="option-group-label">Visualization</div>
+                                <div class="option-list">
+                                    <label class="option-item"><input type="checkbox" data-cat="data" value="bi_tools"><span>BI Tools</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="data" value="dashboards"><span>Custom Dashboards</span></label>
+                                    <label class="option-item"><input type="checkbox" data-cat="data" value="predictive"><span>Predictive Analytics</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- None / Skip -->
+                <div class="category-card" data-category="none">
+                    <div class="category-header" onclick="selectNoIntegrations()">
+                        <input type="checkbox" class="category-checkbox" data-cat="none" onclick="event.stopPropagation(); selectNoIntegrations()">
+                        <div class="category-icon">&#10060;</div>
+                        <div class="category-info">
+                            <div class="category-label">None / Not Sure</div>
+                            <div class="category-description">Skip this step</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="integrations-continue" onclick="continueFromIntegrations()">Continue</button>
+            `;
+        }
+
+        function toggleCategory(header) {
+            const card = header.closest('.category-card');
+            const checkbox = card.querySelector('.category-checkbox');
+            const isExpanded = card.classList.contains('expanded');
+
+            // Uncheck "None" if selecting other categories
+            const noneCat = document.querySelector('[data-category="none"]');
+            if (noneCat && card !== noneCat) {
+                noneCat.querySelector('.category-checkbox').checked = false;
+            }
+
+            if (isExpanded) {
+                card.classList.remove('expanded');
+                checkbox.checked = false;
+            } else {
+                card.classList.add('expanded');
+                checkbox.checked = true;
+            }
+        }
+
+        function selectNoIntegrations() {
+            // Uncheck all other categories
+            document.querySelectorAll('.category-card').forEach(card => {
+                card.classList.remove('expanded', 'has-selections');
+                card.querySelector('.category-checkbox').checked = false;
+                card.querySelectorAll('.option-item input:checked').forEach(opt => {
+                    opt.checked = false;
+                    opt.closest('.option-item').classList.remove('selected');
+                });
+                const countEl = card.querySelector('.category-count');
+                if (countEl) countEl.textContent = '0';
+            });
+
+            // Check "None"
+            const noneCard = document.querySelector('[data-category="none"]');
+            if (noneCard) {
+                noneCard.querySelector('.category-checkbox').checked = true;
+            }
+        }
+
+        function setupExpandableCategories() {
+            document.querySelectorAll('.option-item input').forEach(input => {
+                input.addEventListener('change', () => {
+                    input.closest('.option-item').classList.toggle('selected', input.checked);
+                    updateCategoryCount(input.closest('.category-card'));
+
+                    // Uncheck "None" when selecting options
+                    if (input.checked) {
+                        const noneCat = document.querySelector('[data-category="none"]');
+                        if (noneCat) {
+                            noneCat.querySelector('.category-checkbox').checked = false;
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.category-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', (e) => {
+                    const card = checkbox.closest('.category-card');
+                    if (card.dataset.category === 'none') return;
+
+                    if (checkbox.checked) {
+                        card.classList.add('expanded');
+                    } else {
+                        card.classList.remove('expanded');
+                        card.querySelectorAll('.option-item input:checked').forEach(opt => {
+                            opt.checked = false;
+                            opt.closest('.option-item').classList.remove('selected');
+                        });
+                        updateCategoryCount(card);
+                    }
+                });
+            });
+        }
+
+        function updateCategoryCount(card) {
+            const count = card.querySelectorAll('.option-item input:checked').length;
+            const countEl = card.querySelector('.category-count');
+            if (countEl) {
+                countEl.textContent = count;
+                if (count > 0) {
+                    card.classList.add('has-selections');
+                } else {
+                    card.classList.remove('has-selections');
+                }
+            }
+        }
+
+        function getSelectedIntegrations() {
+            const integrations = {};
+
+            document.querySelectorAll('.category-card').forEach(card => {
+                const category = card.dataset.category;
+                if (category === 'none') {
+                    if (card.querySelector('.category-checkbox').checked) {
+                        integrations.none = true;
+                    }
+                    return;
+                }
+
+                const selected = [];
+                card.querySelectorAll('.option-item input:checked').forEach(input => {
+                    selected.push(input.value);
+                });
+
+                if (selected.length > 0) {
+                    integrations[category] = selected;
+                }
+            });
+
+            return integrations;
+        }
+
+        function continueFromIntegrations() {
+            if (isProcessing) return;
+            isProcessing = true;
+
+            const q = questions[currentStep];
+            const integrations = getSelectedIntegrations();
+            userData[q.field] = integrations;
+
+            // Create summary for display
+            let summary = 'None selected';
+            if (!integrations.none) {
+                const counts = Object.keys(integrations).map(cat => {
+                    return `${cat}: ${integrations[cat].length}`;
+                });
+                if (counts.length > 0) {
+                    summary = counts.join(', ');
+                }
+            }
+
+            addMessage(summary, true);
+            inputArea.style.display = 'block';
+
+            currentStep++;
+            isProcessing = false;
+            askQuestion();
+        }
+
+        // =============================================================================
         // N8N WEBHOOK SUBMISSION
         // =============================================================================
         async function submitData() {
@@ -619,7 +1240,8 @@
                 const response = await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'X-API-Key': 'eXjqAaSiMwinmuYHLzaX83HoNal0iPutGpP855eHjh8'
                     },
                     body: JSON.stringify({
                         name: userData.name,
@@ -629,6 +1251,7 @@
                         budget: userData.budget,
                         timeline: userData.timeline,
                         description: userData.description,
+                        integrations: userData.integrations || {},
                         submitted_at: new Date().toISOString(),
                         source: 'start.html'
                     })
