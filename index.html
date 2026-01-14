@@ -243,7 +243,9 @@
                     <a href="https://linkedin.com" class="contact-link"><span class="contact-link-icon">in</span>LinkedIn</https://github.com/SirSote>
                 </div>
             </div>
-            <form class="contact-form" action="https://n8n.sirsote.com/webhook/contact" method="POST">
+            <!-- TODO: BROKEN - /webhook/contact does not exist. Need to create contact workflow. -->
+            <!-- Audit: 2026-01-14 - Contact form disabled until workflow is created -->
+            <form class="contact-form" action="#" method="POST" onsubmit="alert('Contact form coming soon. Please email git@sirsote.com directly.'); return false;">
                 <div class="form-group"><label for="name">Name</label><input type="text" id="name" name="name" required></div>
                 <div class="form-group"><label for="email">Email</label><input type="email" id="email" name="email" required></div>
                 <div class="form-group"><label for="message">Message</label><textarea id="message" name="message" required></textarea></div>

@@ -8,8 +8,10 @@
     'use strict';
 
     // Configuration
+    // TODO: BROKEN - This webhook no longer exists. Need to create chat workflow or remove widget.
+    // Audit: 2026-01-14 - Original webhook was deleted when old workflow was removed
     const CONFIG = {
-        chatUrl: 'https://n8n.sirsote.com/webhook/a73623b9-ba80-4f92-8ae1-28b8dff8d324/chat',
+        chatUrl: null, // DISABLED - was: 'https://n8n.sirsote.com/webhook/a73623b9-ba80-4f92-8ae1-28b8dff8d324/chat'
         botName: 'SirSote-Echo'
     };
 
@@ -174,6 +176,12 @@
 
     // Initialize widget
     function init() {
+        // AUDIT: Skip initialization if chatUrl is not configured
+        if (!CONFIG.chatUrl) {
+            console.warn('SirSote-Echo Chat Widget: chatUrl not configured. Widget disabled.');
+            return;
+        }
+
         // Add styles
         const styleEl = document.createElement('style');
         styleEl.textContent = styles;
