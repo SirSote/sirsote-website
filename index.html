@@ -277,6 +277,72 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
+        /* Certifications Section */
+        #certifications {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .certs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .cert-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            transition: all 0.3s;
+        }
+
+        .cert-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .cert-card .cert-status {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 2px;
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .cert-card .cert-status.active {
+            background: var(--accent-dim);
+            color: var(--accent);
+        }
+
+        .cert-card .cert-status.progress {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .cert-card .cert-status.completed {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+
+        .cert-card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .cert-card .cert-issuer {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .cert-card .cert-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
         /* Tools Section */
         #tools {
             border-bottom: 1px solid var(--border);
@@ -467,6 +533,7 @@
         <a href="#" class="logo">SirSote</a>
         <ul class="nav-links">
             <li><a href="#about">About</a></li>
+            <li><a href="#certifications">Certs</a></li>
             <li><a href="#tools">Tools</a></li>
             <li><a href="#projects">Projects</a></li>
             <li><a href="#contact">Contact</a></li>
@@ -490,27 +557,86 @@
                     <div class="section-tag">// About</div>
                     <h2 class="section-title">Bryan Jones</h2>
                 </div>
-                <p>I'm Bryan, based in <strong>Orange County, CA</strong>. I've been a business owner and developer for over <strong>20 years</strong>, focused on building systems that help companies grow, scale, and operate more efficiently.</p>
-                <p>This site runs on a VPS I configured myself. The automation backend uses n8n in Docker. Every piece of this stack is something I've built, deployed, and maintain.</p>
+                <p>I'm Bryan, based in <strong>Arizona</strong>. I've been a business owner and developer for over <strong>20 years</strong>, focused on building systems that help companies grow, scale, and operate more efficiently.</p>
+                <p>Currently enrolled in <strong>Per Scholas Data Center Tech w/AI</strong> program, pursuing CompTIA certifications while building automation systems and home lab environments with VMware, Docker, and Linux.</p>
             </div>
             <div class="about-skills">
                 <div class="skill-group">
                     <h3>Background</h3>
                     <ul>
-                        <li>Self-taught developer</li>
+                        <li>20+ years business operations</li>
                         <li>Certified Scrum Master (CSM)</li>
-                        <li>Project Management Professional</li>
+                        <li>Per Scholas Data Center Tech w/AI</li>
+                        <li>CompTIA A+, Network+, Security+ (In Progress)</li>
                     </ul>
                 </div>
                 <div class="skill-group">
                     <h3>Core Strengths</h3>
                     <ul>
-                        <li>AI automation (n8n)</li>
-                        <li>Project planning & delivery</li>
-                        <li>Business development</li>
-                        <li>Systems design</li>
+                        <li>Linux / Ubuntu administration</li>
+                        <li>VMware & virtualization</li>
+                        <li>Docker & containers</li>
+                        <li>Networking fundamentals</li>
+                        <li>AI automation & workflows</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="certifications">
+        <div class="section-header">
+            <div class="section-tag">// Certifications & Training</div>
+            <h2 class="section-title">Credentials</h2>
+        </div>
+        <div class="certs-grid">
+            <div class="cert-card">
+                <span class="cert-status active">ACTIVE</span>
+                <h3>Certified Scrum Master (CSM)</h3>
+                <p class="cert-issuer">Scrum Alliance</p>
+                <p class="cert-date">Earned 2024</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status progress">IN PROGRESS</span>
+                <h3>CompTIA A+</h3>
+                <p class="cert-issuer">CompTIA - Core 1 & Core 2</p>
+                <p class="cert-date">Expected Q3 2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status progress">IN PROGRESS</span>
+                <h3>CompTIA Network+</h3>
+                <p class="cert-issuer">CompTIA</p>
+                <p class="cert-date">Expected Q4 2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status progress">IN PROGRESS</span>
+                <h3>CompTIA Security+</h3>
+                <p class="cert-issuer">CompTIA</p>
+                <p class="cert-date">Expected Q4 2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status progress">IN PROGRESS</span>
+                <h3>Data Center Tech w/AI</h3>
+                <p class="cert-issuer">Per Scholas</p>
+                <p class="cert-date">15-Week Program - 2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status completed">COMPLETED</span>
+                <h3>Creating Compelling Reports</h3>
+                <p class="cert-issuer">Cisco NetAcad</p>
+                <p class="cert-date">2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status completed">COMPLETED</span>
+                <h3>Engaging Stakeholders</h3>
+                <p class="cert-issuer">Cisco NetAcad</p>
+                <p class="cert-date">2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status completed">COMPLETED</span>
+                <h3>Microsoft 365 Copilot</h3>
+                <p class="cert-issuer">Microsoft Learn</p>
+                <p class="cert-date">2026</p>
             </div>
         </div>
     </section>
