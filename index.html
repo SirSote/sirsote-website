@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SirSote | AI Automation</title>
+    <title>SirSote | Projects</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
@@ -277,7 +277,70 @@
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Certifications Section */
+        .project-status {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.04em;
+            padding: 0.2rem 0.5rem;
+            background: var(--accent-dim);
+            color: var(--accent);
+            display: inline-block;
+            margin-bottom: 0.75rem;
+        }
+
+        .project-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .project-links a {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .project-links a:hover { text-decoration: underline; }
+
+        /* Production */
+        #production {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .video-frame {
+            position: relative;
+            width: 100%;
+            max-width: 960px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .video-frame iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .production-note {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+        }
+
+        .production-note a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .production-note a:hover { text-decoration: underline; }
+
+        /* Credentials */
         #certifications {
             border-bottom: 1px solid var(--border);
         }
@@ -348,9 +411,22 @@
             border-bottom: 1px solid var(--border);
         }
 
+        .tools-group {
+            margin-bottom: 2.5rem;
+        }
+
+        .tools-group h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
         .tools-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1.5rem;
         }
 
@@ -533,20 +609,20 @@
         <a href="#" class="logo">SirSote</a>
         <ul class="nav-links">
             <li><a href="#about">About</a></li>
-            <li><a href="#certifications">Certs</a></li>
+            <li><a href="#production">Production</a></li>
             <li><a href="#tools">Tools</a></li>
             <li><a href="#projects">Projects</a></li>
+            <li><a href="#certifications">Credentials</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
     </nav>
 
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-tag">AI Automation</div>
-            <h1>Systems That Help <span class="accent-text">Businesses Grow</span></h1>
-            <p class="hero-description"><strong>AI automation</strong> combines artificial intelligence with workflow tools and integrations to handle repetitive tasks, process data, and connect your business systems.</p>
-            <p class="hero-description">It saves time by running <strong>24/7</strong> without breaks. It reduces errors by following the same process every time. It scales your operations without adding headcount.</p>
-            <p class="hero-description">Every modern business should be using automation. The ones that do move faster, stay consistent, and gain competitive advantage.</p>
+            <div class="hero-tag">Freelance</div>
+            <h1>Projects, tools, and the <span class="accent-text">shows I run</span></h1>
+            <p class="hero-description">This page is the dashboard. Event production, the software on this machine, and the credentials that are earned.</p>
+            <p class="hero-description">The cards are the real builds. The status on a card is the status. A link means there is a public repo or a page.</p>
         </div>
     </section>
 
@@ -558,30 +634,67 @@
                     <h2 class="section-title">Bryan Jones</h2>
                 </div>
                 <p>I'm Bryan, based in <strong>Orange County, CA</strong>. I've been a business owner and developer for over <strong>20 years</strong>, focused on building systems that help companies grow, scale, and operate more efficiently.</p>
-                <p>Currently enrolled in <strong>Per Scholas Data Center Tech w/AI</strong> program, pursuing CompTIA certifications while building automation systems and home lab environments with VMware, Docker, and Linux.</p>
+                <p>I built <strong>Event Devise</strong>, a full-service event production company, and I run software projects as a <strong>Certified Scrum Master</strong> (Scrum Alliance, active through July 2028). The Pluto TV holiday party is the show on this site: audio, video, and show calling on one run of show.</p>
+                <p>The work on this site is the stuff running on one Kali machine: an intake chat, vertical explainer reels, a listen-first study product, and a self-hosted map. Docker holds the schedulers and image pipeline. Cursor and Vercel are how it gets written and shipped.</p>
             </div>
             <div class="about-skills">
                 <div class="skill-group">
-                    <h3>Background</h3>
+                    <h3>On this machine</h3>
                     <ul>
-                        <li>20+ years business operations</li>
-                        <li>Certified Scrum Master (CSM)</li>
-                        <li>Per Scholas Data Center Tech w/AI</li>
-                        <li>CompTIA A+, Network+, Security+ (In Progress)</li>
+                        <li>Cursor and VS Code for the actual edits</li>
+                        <li>Vercel for sirsote.com and Echo</li>
+                        <li>Python and Node for the apps</li>
+                        <li>Local voice, video, and models</li>
                     </ul>
                 </div>
                 <div class="skill-group">
-                    <h3>Core Strengths</h3>
+                    <h3>What that turns into</h3>
                     <ul>
-                        <li>Linux / Ubuntu administration</li>
-                        <li>VMware & virtualization</li>
-                        <li>Docker & containers</li>
-                        <li>Networking fundamentals</li>
-                        <li>AI automation & workflows</li>
+                        <li>Echo — client intake that drafts a BRD</li>
+                        <li>Rick — script, cloned voice, 9:16 reel</li>
+                        <li>Blaze — gets that reel onto Instagram</li>
+                        <li>SpekFrst — vocabulary you hear, not flashcards</li>
                     </ul>
                 </div>
             </div>
         </div>
+    </section>
+
+    <section id="production">
+        <div class="section-header">
+            <div class="section-tag">// Production</div>
+            <h2 class="section-title">Event Devise</h2>
+        </div>
+        <p class="hero-description" style="max-width: 800px; margin-bottom: 1rem;">Full-service event production management. The show is planned, crewed, and called. Audio, video, and the floor stay on the same clock.</p>
+        <p class="hero-description" style="max-width: 800px; margin-bottom: 2rem;">The case here is the <strong>Pluto TV holiday party</strong>. Joswin Media shot the video. It lives on the Event Devise channel as the record of that production.</p>
+        <div class="video-frame">
+            <iframe
+                src="https://www.youtube-nocookie.com/embed/2ry6REesRHM"
+                title="Pluto TV holiday party — full-service event production management"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div class="tools-grid">
+            <div class="tool-card">
+                <h3>Audio</h3>
+                <p>The room and the program. What the guests hear, and the playback that has to land on cue.</p>
+            </div>
+            <div class="tool-card">
+                <h3>Video</h3>
+                <p>Picture in the room and the record of the night. Screens, playback, and the cut that leaves with the client.</p>
+            </div>
+            <div class="tool-card">
+                <h3>Show calling</h3>
+                <p>One call so audio, video, and the floor move together. The cue list is the clock for the room.</p>
+            </div>
+            <div class="tool-card">
+                <h3>Project management</h3>
+                <p>Run of show, crew, and vendors before the doors open. Same job as the Scrum Master work: a team, a clock, and a definition of done. Credential is current through July 2028.</p>
+            </div>
+        </div>
+        <p class="production-note">Channel: <a href="https://www.youtube.com/@EventDevise" target="_blank" rel="noopener">Event Devise</a> · Video: <a href="https://www.youtube.com/watch?v=2ry6REesRHM" target="_blank" rel="noopener">Pluto TV holiday party</a> · Shot by Joswin Media</p>
     </section>
 
     <section id="certifications">
@@ -592,51 +705,75 @@
         <div class="certs-grid">
             <div class="cert-card">
                 <span class="cert-status active">ACTIVE</span>
-                <h3>Certified Scrum Master (CSM)</h3>
+                <h3>Certified Scrum Master</h3>
                 <p class="cert-issuer">Scrum Alliance</p>
-                <p class="cert-date">Earned 2024</p>
+                <p class="cert-date">Earned 2024 · through July 2028</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status completed">EARNED</span>
+                <h3>Google IT Support</h3>
+                <p class="cert-issuer">Google / Coursera · Professional Certificate</p>
+                <p class="cert-date">2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status completed">EARNED</span>
+                <h3>Google AI Essentials</h3>
+                <p class="cert-issuer">Google / Coursera</p>
+                <p class="cert-date">2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status completed">EARNED</span>
+                <h3>Cisco Networking Academy</h3>
+                <p class="cert-issuer">Reports, stakeholders, hardware basics, operating systems basics</p>
+                <p class="cert-date">2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status completed">EARNED</span>
+                <h3>Microsoft 365 Copilot</h3>
+                <p class="cert-issuer">Microsoft Learn</p>
+                <p class="cert-date">2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status completed">EARNED</span>
+                <h3>NFPA 70E 2024</h3>
+                <p class="cert-issuer">360training · electrical safety</p>
+                <p class="cert-date">2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status completed">EARNED</span>
+                <h3>OSHA and NFPA Safety</h3>
+                <p class="cert-issuer">Per Scholas</p>
+                <p class="cert-date">2026</p>
+            </div>
+            <div class="cert-card">
+                <span class="cert-status active">ACTIVE</span>
+                <h3>TryHackMe Pre Security</h3>
+                <p class="cert-issuer">TryHackMe</p>
+                <p class="cert-date">2025 · through December 2028</p>
             </div>
             <div class="cert-card">
                 <span class="cert-status progress">IN PROGRESS</span>
                 <h3>CompTIA A+</h3>
-                <p class="cert-issuer">CompTIA - Core 1 & Core 2</p>
-                <p class="cert-date">Expected Q3 2026</p>
+                <p class="cert-issuer">CompTIA · Core 1 and Core 2</p>
+                <p class="cert-date">Open</p>
             </div>
             <div class="cert-card">
                 <span class="cert-status progress">IN PROGRESS</span>
                 <h3>CompTIA Network+</h3>
                 <p class="cert-issuer">CompTIA</p>
-                <p class="cert-date">Expected Q4 2026</p>
+                <p class="cert-date">Open</p>
             </div>
             <div class="cert-card">
                 <span class="cert-status progress">IN PROGRESS</span>
                 <h3>CompTIA Security+</h3>
                 <p class="cert-issuer">CompTIA</p>
-                <p class="cert-date">Expected Q4 2026</p>
+                <p class="cert-date">Open</p>
             </div>
             <div class="cert-card">
                 <span class="cert-status progress">IN PROGRESS</span>
-                <h3>Data Center Tech w/AI</h3>
+                <h3>Data Center Tech with AI</h3>
                 <p class="cert-issuer">Per Scholas</p>
-                <p class="cert-date">15-Week Program - 2026</p>
-            </div>
-            <div class="cert-card">
-                <span class="cert-status completed">COMPLETED</span>
-                <h3>Creating Compelling Reports</h3>
-                <p class="cert-issuer">Cisco NetAcad</p>
-                <p class="cert-date">2026</p>
-            </div>
-            <div class="cert-card">
-                <span class="cert-status completed">COMPLETED</span>
-                <h3>Engaging Stakeholders</h3>
-                <p class="cert-issuer">Cisco NetAcad</p>
-                <p class="cert-date">2026</p>
-            </div>
-            <div class="cert-card">
-                <span class="cert-status completed">COMPLETED</span>
-                <h3>Microsoft 365 Copilot</h3>
-                <p class="cert-issuer">Microsoft Learn</p>
-                <p class="cert-date">2026</p>
+                <p class="cert-date">Open</p>
             </div>
         </div>
     </section>
@@ -646,120 +783,158 @@
             <div class="section-tag">// Tools & Technologies</div>
             <h2 class="section-title">What I Work With</h2>
         </div>
-        <div class="tools-grid">
-            <div class="tool-card">
-                <div class="tool-icon">⚡</div>
-                <h3>n8n</h3>
-                <p>Workflow automation platform</p>
+        <p class="hero-description" style="max-width: 800px; margin-bottom: 2.5rem;">Each card is a tool on this machine and the job it does. Cursor writes the code. Vercel ships the sites. The rest is voice, video, data, or the lab.</p>
+
+        <div class="tools-group">
+            <h3>Write and ship</h3>
+            <div class="tools-grid">
+                <div class="tool-card"><h3>Cursor</h3><p>The editor for this site, Rick, Echo, and the vault. The agent sits in the same window as the file, so a change and the reason for it stay together.</p></div>
+                <div class="tool-card"><h3>VS Code</h3><p>The other window on the same desk. Python, containers, and anything that is already open there stay in VS Code instead of being moved.</p></div>
+                <div class="tool-card"><h3>Claude Code</h3><p>Terminal agent for a longer pass through a repo when the edit is bigger than one file in the editor.</p></div>
+                <div class="tool-card"><h3>Vercel</h3><p>Deploys sirsote.com and the Echo frontend. The CLI is installed here so a local build and the live URL are the same project.</p></div>
+                <div class="tool-card"><h3>Git + GitHub</h3><p>Public source for the website, Echo, Blaze, and Sote Choice. If it is not in a repo, it is still local.</p></div>
+                <div class="tool-card"><h3>Node</h3><p>Runs the site, Echo (Next.js), WorldView (Vite), and Rick’s Remotion compositions.</p></div>
+                <div class="tool-card"><h3>Python</h3><p>Rick’s voice and encode pipeline, Blaze’s publisher, WorldView’s API, and SpekFrst’s drill builder.</p></div>
+                <div class="tool-card"><h3>Obsidian</h3><p>The .sote vault. SpekFrst’s method, agent runbooks, and the notes that have to stay true when the code changes.</p></div>
+                <div class="tool-card"><h3>draw.io</h3><p>Architecture pictures for Echo and Blaze before the folders get confusing.</p></div>
             </div>
-            <div class="tool-card">
-                <div class="tool-icon">🐳</div>
-                <h3>Docker</h3>
-                <p>Container deployment</p>
+        </div>
+
+        <div class="tools-group">
+            <h3>Voice, video, models</h3>
+            <div class="tools-grid">
+                <div class="tool-card"><h3>Claude API</h3><p>Echo’s brain. A visitor describes a job and Claude turns that chat into a requirements draft.</p></div>
+                <div class="tool-card"><h3>Ollama</h3><p>Local models on this box: Llama 3.1 8B, Llama 3.2 3B, and TinyLlama. Used when a script should not leave the machine.</p></div>
+                <div class="tool-card"><h3>OpenClaw</h3><p>Local agent gateway. It is running on this PC so agents can talk to the machine without a hosted middleman.</p></div>
+                <div class="tool-card"><h3>Chatterbox</h3><p>Rick’s voice. One recorded print, then new scripts spoken in that voice on CPU. No ElevenLabs account.</p></div>
+                <div class="tool-card"><h3>Piper</h3><p>A plain local voice for layout tests and spoken drills, when the clone is more than the job needs.</p></div>
+                <div class="tool-card"><h3>faster-whisper</h3><p>Times every word in Rick’s audio so Remotion can move the caption with the voice.</p></div>
+                <div class="tool-card"><h3>Remotion</h3><p>Rick’s 9:16 picture, written in React. One clip at a time. This PC overheats if you render a batch.</p></div>
+                <div class="tool-card"><h3>FFmpeg</h3><p>Turns the Remotion frame sequence into an H.264 reel Instagram can take.</p></div>
+                <div class="tool-card"><h3>ComfyUI</h3><p>Local image generation on the AMD GPU through a ROCm Docker image. The t-shirt path is parked. Blaze’s job now is video.</p></div>
+                <div class="tool-card"><h3>OBS Studio</h3><p>Screen capture when a project needs a recording of the desk, not a rendered clip.</p></div>
             </div>
-            <div class="tool-card">
-                <div class="tool-icon">🐧</div>
-                <h3>Linux</h3>
-                <p>Server administration</p>
+        </div>
+
+        <div class="tools-group">
+            <h3>Run it</h3>
+            <div class="tools-grid">
+                <div class="tool-card"><h3>Kali Linux</h3><p>The daily OS. It is the host for Docker, the lab tools, and every project folder on this PC.</p></div>
+                <div class="tool-card"><h3>Docker</h3><p>Keeps Mixpost, MariaDB, Redis, ComfyUI, PhoneInfoga, and pgAdmin off the host Python. Mixpost is the one that is up for Blaze.</p></div>
+                <div class="tool-card"><h3>Mixpost</h3><p>Self-hosted scheduler. Blaze uses it to line up Rick’s reels. The Instagram reel upload is still the unfinished part.</p></div>
+                <div class="tool-card"><h3>PostgreSQL</h3><p>Local database on this machine. DBeaver and pgAdmin are how it gets looked at. Echo’s hosted data is Supabase.</p></div>
+                <div class="tool-card"><h3>Supabase + Resend</h3><p>Echo’s accounts and the email that leaves after an intake. They live with the Next.js app, not in a generic “API” bucket.</p></div>
+                <div class="tool-card"><h3>Next.js + Tailwind</h3><p>Echo’s interface. The chat, the form, and the requirements page are this stack.</p></div>
+                <div class="tool-card"><h3>Vite + MapLibre</h3><p>WorldView’s map. Open tiles, aircraft and satellite tracks, drawn in the browser.</p></div>
+                <div class="tool-card"><h3>FastAPI</h3><p>WorldView’s small Python API: feeds for the map and a hook for a local model.</p></div>
+                <div class="tool-card"><h3>Proton VPN</h3><p>The tunnel on this machine for lab traffic and ordinary browsing.</p></div>
+                <div class="tool-card"><h3>VirtualBox</h3><p>Guest machines when a lab should not run on the host. The kernel module is missing right now, so guests are not starting.</p></div>
             </div>
-            <div class="tool-card">
-                <div class="tool-icon">🔗</div>
-                <h3>APIs & Webhooks</h3>
-                <p>System integrations</p>
-            </div>
-            <div class="tool-card">
-                <div class="tool-icon">☁️</div>
-                <h3>Cloud / VPS</h3>
-                <p>Infrastructure hosting</p>
-            </div>
-            <div class="tool-card">
-                <div class="tool-icon">🤖</div>
-                <h3>AI Models</h3>
-                <p>Claude API, LLM integrations</p>
-            </div>
-            <div class="tool-card">
-                <div class="tool-icon">💼</div>
-                <h3>CRM Systems</h3>
-                <p>Salesforce, HubSpot</p>
-            </div>
-            <div class="tool-card">
-                <div class="tool-icon">📊</div>
-                <h3>Project Management</h3>
-                <p>Jira, Confluence, Agile</p>
+        </div>
+
+        <div class="tools-group">
+            <h3>Lab only</h3>
+            <div class="tools-grid">
+                <div class="tool-card"><h3>Wireshark + nmap</h3><p>See the packets and map a network that you are allowed to look at. TryHackMe, Hack The Box, or a signed scope.</p></div>
+                <div class="tool-card"><h3>Ghidra</h3><p>Read a binary in a lab. Installed here. Not a service.</p></div>
+                <div class="tool-card"><h3>Metasploit + Impacket</h3><p>Practice techniques that already exist in a lab range. They are not a product and they are not pointed at anyone’s network.</p></div>
+                <div class="tool-card"><h3>Aircrack + Wifite</h3><p>Wireless labs on gear you own or a range that says you may.</p></div>
+                <div class="tool-card"><h3>Hashcat + John</h3><p>Work hashes that came from a lab capture, to learn how weak passwords fail.</p></div>
             </div>
         </div>
     </section>
 
     <section id="projects">
         <div class="section-header" style="max-width: 1200px; margin: 0 auto 3rem;">
-            <div class="section-tag">// Automation Examples</div>
+            <div class="section-tag">// Projects</div>
             <h2 class="section-title">What I Build</h2>
         </div>
         <div class="projects-grid">
             <div class="project-card">
-                <div class="project-image">🔍</div>
                 <div class="project-content">
-                    <div class="project-tags">
-                        <span class="project-tag">SEO</span>
-                        <span class="project-tag">Content</span>
+                    <span class="project-status">CASE STUDY</span>
+                    <h3 class="project-title">Event Devise</h3>
+                    <p class="project-desc">The production company. Full-service event production management. The Pluto TV holiday party is the proof on the page: audio, video, show calling, and the run of show. Joswin Media shot the video.</p>
+                    <div class="project-links">
+                        <a href="#production">On this page</a>
+                        <a href="https://www.youtube.com/watch?v=2ry6REesRHM" target="_blank" rel="noopener">The show</a>
                     </div>
-                    <h3 class="project-title">SEO Workflow</h3>
-                    <p class="project-desc">Automates keyword research, content generation, and publishing to keep your site ranking.</p>
                 </div>
             </div>
             <div class="project-card">
-                <div class="project-image">🛡️</div>
                 <div class="project-content">
-                    <div class="project-tags">
-                        <span class="project-tag">Security</span>
-                        <span class="project-tag">Monitoring</span>
+                    <span class="project-status">IN PROGRESS</span>
+                    <h3 class="project-title">Echo</h3>
+                    <p class="project-desc">A client intake chat. Someone describes the job, Claude drafts the requirements, and Resend can send the follow-up. The frontend is Next.js on Vercel. The public repo is ahead of a clean key rotation, so the live chat host is not the brag yet.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/SirSote/echo-zero" target="_blank">GitHub</a>
+                        <a href="start.html">Intake page</a>
                     </div>
-                    <h3 class="project-title">Security Workflow</h3>
-                    <p class="project-desc">Monitors systems, alerts on anomalies, and logs activity for audit trails.</p>
                 </div>
             </div>
             <div class="project-card">
-                <div class="project-image">📋</div>
                 <div class="project-content">
-                    <div class="project-tags">
-                        <span class="project-tag">CRM</span>
-                        <span class="project-tag">Email</span>
-                    </div>
-                    <h3 class="project-title">Client Onboarding</h3>
-                    <p class="project-desc">Collects info, creates CRM records, and sends welcome emails automatically.</p>
+                    <span class="project-status">IN PROGRESS</span>
+                    <h3 class="project-title">Rick</h3>
+                    <p class="project-desc">Vertical explainer reels made on this PC. A script, Chatterbox speaking it in one cloned voice, Whisper timing the words, Remotion drawing the 9:16 frame, FFmpeg writing the file. Local only. One clip at a time.</p>
                 </div>
             </div>
             <div class="project-card">
-                <div class="project-image">💼</div>
                 <div class="project-content">
-                    <div class="project-tags">
-                        <span class="project-tag">Salesforce</span>
-                        <span class="project-tag">Sync</span>
+                    <span class="project-status">IN PROGRESS</span>
+                    <h3 class="project-title">Blaze</h3>
+                    <p class="project-desc">The publisher for those reels. Mixpost is up in Docker on this machine as the scheduler. The job is Instagram, not t-shirt images. Posting stays off until the reel upload actually works.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/SirSote/blaze" target="_blank">GitHub</a>
                     </div>
-                    <h3 class="project-title">Salesforce Workflow</h3>
-                    <p class="project-desc">Syncs leads, updates deal stages, and triggers follow-up sequences.</p>
                 </div>
             </div>
             <div class="project-card">
-                <div class="project-image">📱</div>
                 <div class="project-content">
-                    <div class="project-tags">
-                        <span class="project-tag">Social</span>
-                        <span class="project-tag">Scheduling</span>
-                    </div>
-                    <h3 class="project-title">Social Media Workflow</h3>
-                    <p class="project-desc">Schedules posts across platforms and tracks engagement metrics.</p>
+                    <span class="project-status">IN PROGRESS</span>
+                    <h3 class="project-title">SpekFrst</h3>
+                    <p class="project-desc">Audio courseware. You hear a field’s vocabulary as a playlist: term, definition, then the sentence it lives in. It is for learning by ear, not flashcards with a robot voice bolted on. Faceless. Still a method and a small player, not a store.</p>
                 </div>
             </div>
             <div class="project-card">
-                <div class="project-image">🤖</div>
                 <div class="project-content">
-                    <div class="project-tags">
-                        <span class="project-tag">AI</span>
-                        <span class="project-tag">Chatbot</span>
+                    <span class="project-status">LOCAL</span>
+                    <h3 class="project-title">WorldView</h3>
+                    <p class="project-desc">A self-hosted map with a satellite-desk feel. MapLibre draws aircraft and satellite tracks from open data. FastAPI serves the feeds. Vite runs the page. No public repo yet.</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">LIVE</span>
+                    <h3 class="project-title">sirsote.com</h3>
+                    <p class="project-desc">This page. A project dashboard, not a menu of imaginary workflows. Written in Cursor, deployed with Vercel. The tools and projects here are the ones on the machine.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/SirSote/sirsote-website" target="_blank">GitHub</a>
                     </div>
-                    <h3 class="project-title">Chatbot Workflow</h3>
-                    <p class="project-desc">Website AI assistant connected to CRM and email automation.</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">PARKED</span>
+                    <h3 class="project-title">Sote Choice</h3>
+                    <p class="project-desc">A premium apparel site. It is a finished public build, separate from the agent work. Left up as proof of a storefront, not as the current product.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/SirSote/sotechoice-website" target="_blank">GitHub</a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">LOCAL</span>
+                    <h3 class="project-title">Solitaire</h3>
+                    <p class="project-desc">Klondike in the same dark green as the site. A small finished game used to keep the front-end hand warm. It lives in the vault and is not deployed.</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">STUDY</span>
+                    <h3 class="project-title">Connector chart</h3>
+                    <p class="project-desc">A visual page for cables, connectors, and ports. The page is written. The pictures are not on the server yet, so it stays off the public nav.</p>
                 </div>
             </div>
         </div>
@@ -770,7 +945,7 @@
             <div class="section-tag">// Connect</div>
             <h2 class="section-title">Find Me Online</h2>
         </div>
-        <p class="contact-intro">Ready to automate your business? Let's talk about what's possible.</p>
+        <p class="contact-intro">The work is on this page. GitHub and the rest are below.</p>
         <div class="contact-links">
             <a href="mailto:git@sirsote.com" class="contact-link">
                 <span class="contact-link-icon">@</span>
@@ -780,7 +955,7 @@
                 <span class="contact-link-icon">GH</span>
                 GitHub
             </a>
-            <a href="https://www.linkedin.com/in/bryan-jones-a5955b28a/" class="contact-link" target="_blank">
+            <a href="https://www.linkedin.com/in/bryan-d-jones-a5955b28a/" class="contact-link" target="_blank">
                 <span class="contact-link-icon">in</span>
                 LinkedIn
             </a>
