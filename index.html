@@ -305,7 +305,29 @@
         .project-links a:hover { text-decoration: underline; }
 
         /* Production */
-        #production {
+        .company-block {
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            padding: 2rem;
+            margin-top: 1rem;
+        }
+
+        .company-kicker {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+        }
+
+        .company-block > h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        #companies,
+        #projects {
             border-bottom: 1px solid var(--border);
         }
 
@@ -609,9 +631,9 @@
         <a href="#" class="logo">SirSote</a>
         <ul class="nav-links">
             <li><a href="#about">About</a></li>
-            <li><a href="#production">Production</a></li>
-            <li><a href="#tools">Tools</a></li>
+            <li><a href="#companies">Companies</a></li>
             <li><a href="#projects">Projects</a></li>
+            <li><a href="#tools">Tools</a></li>
             <li><a href="#certifications">Credentials</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
@@ -619,10 +641,10 @@
 
     <section class="hero">
         <div class="hero-content">
-            <div class="hero-tag">Bryan Jones</div>
-            <h1>Projects, credentials, and the <span class="accent-text">businesses I build</span></h1>
-            <p class="hero-description">I build my own companies, and I help clients build theirs. This page is the wide view: the projects, the businesses, and the certifications behind the work.</p>
-            <p class="hero-description">Production, software, and client systems each have a section below. The status on a card is the status. A link means there is a public repo or a page.</p>
+            <div class="hero-tag">Universal Consulting LLC</div>
+            <h1>Bryan Jones</h1>
+            <p class="hero-description">I'm Bryan, in <strong>Orange County</strong>. <strong>Universal Consulting LLC</strong> is the company I built. Through it I build businesses, and I help clients build theirs.</p>
+            <p class="hero-description">The companies and projects below were built under that name. Each one stands as its own work.</p>
         </div>
     </section>
 
@@ -631,73 +653,153 @@
             <div class="about-text">
                 <div class="section-header">
                     <div class="section-tag">// About</div>
-                    <h2 class="section-title">Bryan Jones</h2>
+                    <h2 class="section-title">The firm</h2>
                 </div>
-                <p>I'm Bryan, based in <strong>Orange County, CA</strong>. I've been a business owner and developer for over <strong>20 years</strong>. I build companies, and I help clients build theirs.</p>
-                <p>I built <strong>Universal Consulting LLC</strong>.</p>
-                <p>I co-founded <strong>Event Devise</strong> with my wife, <strong>Kara Jones</strong>. We produced live events for <strong>5 Star</strong>, <strong>Montage Laguna Beach</strong>, <strong>Pluto TV</strong>, and <strong>Live Nation</strong>, working alongside <strong>MiMedia</strong> and <strong>AK Johnston</strong>.</p>
-                <p>I'm a <strong>Certified Scrum Master</strong> (Scrum Alliance, active through July 2028). The software further down the page is the current build work: client systems, reels, a listen-first study product, and a self-hosted map.</p>
+                <p>Universal Consulting is how the work gets done. I start it, I plan it, and I carry it through delivery, whether the business is mine or a client's.</p>
+                <p>That is the biography. The companies and projects are the next sections. They are what we built under the firm, and they keep their own names.</p>
             </div>
             <div class="about-skills">
                 <div class="skill-group">
-                    <h3>Companies</h3>
+                    <h3>What the firm does</h3>
                     <ul>
-                        <li>Universal Consulting LLC</li>
-                        <li>Event Devise, with Kara Jones</li>
-                        <li>Client systems and software builds</li>
-                        <li>Certified Scrum Master through 2028</li>
-                    </ul>
-                </div>
-                <div class="skill-group">
-                    <h3>Live events</h3>
-                    <ul>
-                        <li>5 Star</li>
-                        <li>Montage Laguna Beach</li>
-                        <li>Pluto TV</li>
-                        <li>Live Nation, alongside MiMedia and AK Johnston</li>
+                        <li>Build a business</li>
+                        <li>Help a client build theirs</li>
+                        <li>Plan the work and deliver it</li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="production">
+    <section id="companies">
         <div class="section-header">
-            <div class="section-tag">// Production</div>
-            <h2 class="section-title">Event Devise</h2>
+            <div class="section-tag">// Under Universal Consulting</div>
+            <h2 class="section-title">Companies</h2>
         </div>
-        <p class="hero-description" style="max-width: 800px; margin-bottom: 1rem;">The live-event company I co-founded with Kara Jones. The show is planned, crewed, and called. Audio, video, and the floor stay on the same clock.</p>
-        <p class="hero-description" style="max-width: 800px; margin-bottom: 1rem;">Live events for <strong>5 Star</strong>, <strong>Montage Laguna Beach</strong>, <strong>Pluto TV</strong>, and <strong>Live Nation</strong>, working alongside <strong>MiMedia</strong> and <strong>AK Johnston</strong>.</p>
-        <p class="hero-description" style="max-width: 800px; margin-bottom: 2rem;">The case here is the <strong>Pluto TV holiday party</strong>. Joswin Media shot the video. It lives on the Event Devise channel as the record of that production.</p>
-        <div class="video-frame">
-            <iframe
-                src="https://www.youtube-nocookie.com/embed/2ry6REesRHM"
-                title="Pluto TV holiday party — full-service event production management"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div class="tools-grid">
-            <div class="tool-card">
-                <h3>Audio</h3>
-                <p>The room and the program. What the guests hear, and the playback that has to land on cue.</p>
+        <p class="hero-description" style="max-width: 800px; margin-bottom: 2rem;">Companies built under the firm. Each one is shown as itself.</p>
+        <article class="company-block">
+            <div class="company-kicker">Company</div>
+            <h3>Event Devise</h3>
+            <p class="hero-description" style="max-width: 800px; margin-bottom: 1rem;">The live-event company I co-founded with Kara Jones. The show is planned, crewed, and called. Audio, video, and the floor stay on the same clock.</p>
+            <p class="hero-description" style="max-width: 800px; margin-bottom: 1rem;">Live events for <strong>5 Star</strong>, <strong>Montage Laguna Beach</strong>, <strong>Pluto TV</strong>, and <strong>Live Nation</strong>, working alongside <strong>MiMedia</strong> and <strong>AK Johnston</strong>.</p>
+            <p class="hero-description" style="max-width: 800px; margin-bottom: 2rem;">The record here is the <strong>Pluto TV holiday party</strong>. Joswin Media shot the video.</p>
+            <div class="video-frame">
+                <iframe
+                    src="https://www.youtube-nocookie.com/embed/2ry6REesRHM"
+                    title="Pluto TV holiday party — Event Devise"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerpolicy="strict-origin-when-cross-origin"
+                    allowfullscreen>
+                </iframe>
             </div>
-            <div class="tool-card">
-                <h3>Video</h3>
-                <p>Picture in the room and the record of the night. Screens, playback, and the cut that leaves with the client.</p>
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <h3>Audio</h3>
+                    <p>The room and the program. What the guests hear, and the playback that has to land on cue.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Video</h3>
+                    <p>Picture in the room and the record of the night. Screens, playback, and the cut that leaves with the client.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Show calling</h3>
+                    <p>One call so audio, video, and the floor move together. The cue list is the clock for the room.</p>
+                </div>
+                <div class="tool-card">
+                    <h3>Project management</h3>
+                    <p>Run of show, crew, and vendors before the doors open. A team, a clock, and a definition of done.</p>
+                </div>
             </div>
-            <div class="tool-card">
-                <h3>Show calling</h3>
-                <p>One call so audio, video, and the floor move together. The cue list is the clock for the room.</p>
-            </div>
-            <div class="tool-card">
-                <h3>Project management</h3>
-                <p>Run of show, crew, and vendors before the doors open. Same job as the Scrum Master work: a team, a clock, and a definition of done. Credential is current through July 2028.</p>
-            </div>
-        </div>
-        <p class="production-note">Channel: <a href="https://www.youtube.com/@EventDevise" target="_blank" rel="noopener">Event Devise</a> · Video: <a href="https://www.youtube.com/watch?v=2ry6REesRHM" target="_blank" rel="noopener">Pluto TV holiday party</a> · Shot by Joswin Media</p>
+            <p class="production-note">Channel: <a href="https://www.youtube.com/@EventDevise" target="_blank" rel="noopener">Event Devise</a> · Video: <a href="https://www.youtube.com/watch?v=2ry6REesRHM" target="_blank" rel="noopener">Pluto TV holiday party</a> · Shot by Joswin Media</p>
+        </article>
     </section>
+
+    <section id="projects">
+        <div class="section-header" style="max-width: 1200px; margin: 0 auto 3rem;">
+            <div class="section-tag">// Under Universal Consulting</div>
+            <h2 class="section-title">Projects</h2>
+        </div>
+        <p class="hero-description" style="max-width: 800px; margin: 0 auto 2rem;">Projects built under the firm. Each card is that project.</p>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">IN PROGRESS</span>
+                    <h3 class="project-title">Echo</h3>
+                    <p class="project-desc">A client intake chat. Someone describes the job, Claude drafts the requirements, and Resend can send the follow-up. The frontend is Next.js on Vercel. The public repo is ahead of a clean key rotation, so the live chat host is not the brag yet.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/SirSote/echo-zero" target="_blank">GitHub</a>
+                        <a href="start.html">Intake page</a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">IN PROGRESS</span>
+                    <h3 class="project-title">Rick</h3>
+                    <p class="project-desc">Vertical explainer reels made on this PC. A script, Chatterbox speaking it in one cloned voice, Whisper timing the words, Remotion drawing the 9:16 frame, FFmpeg writing the file. Local only. One clip at a time.</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">IN PROGRESS</span>
+                    <h3 class="project-title">Blaze</h3>
+                    <p class="project-desc">The publisher for those reels. Mixpost is up in Docker on this machine as the scheduler. The job is Instagram, not t-shirt images. Posting stays off until the reel upload actually works.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/SirSote/blaze" target="_blank">GitHub</a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">IN PROGRESS</span>
+                    <h3 class="project-title">SpekFrst</h3>
+                    <p class="project-desc">Audio courseware. You hear a field’s vocabulary as a playlist: term, definition, then the sentence it lives in. It is for learning by ear, not flashcards with a robot voice bolted on. Faceless. Still a method and a small player, not a store.</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">LOCAL</span>
+                    <h3 class="project-title">WorldView</h3>
+                    <p class="project-desc">A self-hosted map with a satellite-desk feel. MapLibre draws aircraft and satellite tracks from open data. FastAPI serves the feeds. Vite runs the page. No public repo yet.</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">LIVE</span>
+                    <h3 class="project-title">sirsote.com</h3>
+                    <p class="project-desc">This page. A project dashboard, not a menu of imaginary workflows. Written in Cursor, deployed with Vercel. The tools and projects here are the ones on the machine.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/SirSote/sirsote-website" target="_blank">GitHub</a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">PARKED</span>
+                    <h3 class="project-title">Sote Choice</h3>
+                    <p class="project-desc">A premium apparel site. It is a finished public build, separate from the agent work. Left up as proof of a storefront, not as the current product.</p>
+                    <div class="project-links">
+                        <a href="https://github.com/SirSote/sotechoice-website" target="_blank">GitHub</a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">LOCAL</span>
+                    <h3 class="project-title">Solitaire</h3>
+                    <p class="project-desc">Klondike in the same dark green as the site. A small finished game used to keep the front-end hand warm. It lives in the vault and is not deployed.</p>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">STUDY</span>
+                    <h3 class="project-title">Connector chart</h3>
+                    <p class="project-desc">A visual page for cables, connectors, and ports. The page is written. The pictures are not on the server yet, so it stays off the public nav.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
     <section id="certifications">
         <div class="section-header">
@@ -842,109 +944,6 @@
                 <div class="tool-card"><h3>Metasploit + Impacket</h3><p>Practice techniques that already exist in a lab range. They are not a product and they are not pointed at anyone’s network.</p></div>
                 <div class="tool-card"><h3>Aircrack + Wifite</h3><p>Wireless labs on gear you own or a range that says you may.</p></div>
                 <div class="tool-card"><h3>Hashcat + John</h3><p>Work hashes that came from a lab capture, to learn how weak passwords fail.</p></div>
-            </div>
-        </div>
-    </section>
-
-    <section id="projects">
-        <div class="section-header" style="max-width: 1200px; margin: 0 auto 3rem;">
-            <div class="section-tag">// Projects</div>
-            <h2 class="section-title">What I Build</h2>
-        </div>
-        <div class="projects-grid">
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">BUSINESS</span>
-                    <h3 class="project-title">Universal Consulting LLC</h3>
-                    <p class="project-desc">The consulting company I built.</p>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">CASE STUDY</span>
-                    <h3 class="project-title">Event Devise</h3>
-                    <p class="project-desc">Co-founded with Kara Jones. Live events for 5 Star, Montage Laguna Beach, Pluto TV, and Live Nation, alongside MiMedia and AK Johnston. The Pluto TV holiday party is the video on this page. Joswin Media shot it.</p>
-                    <div class="project-links">
-                        <a href="#production">On this page</a>
-                        <a href="https://www.youtube.com/watch?v=2ry6REesRHM" target="_blank" rel="noopener">The show</a>
-                    </div>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">IN PROGRESS</span>
-                    <h3 class="project-title">Echo</h3>
-                    <p class="project-desc">A client intake chat. Someone describes the job, Claude drafts the requirements, and Resend can send the follow-up. The frontend is Next.js on Vercel. The public repo is ahead of a clean key rotation, so the live chat host is not the brag yet.</p>
-                    <div class="project-links">
-                        <a href="https://github.com/SirSote/echo-zero" target="_blank">GitHub</a>
-                        <a href="start.html">Intake page</a>
-                    </div>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">IN PROGRESS</span>
-                    <h3 class="project-title">Rick</h3>
-                    <p class="project-desc">Vertical explainer reels made on this PC. A script, Chatterbox speaking it in one cloned voice, Whisper timing the words, Remotion drawing the 9:16 frame, FFmpeg writing the file. Local only. One clip at a time.</p>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">IN PROGRESS</span>
-                    <h3 class="project-title">Blaze</h3>
-                    <p class="project-desc">The publisher for those reels. Mixpost is up in Docker on this machine as the scheduler. The job is Instagram, not t-shirt images. Posting stays off until the reel upload actually works.</p>
-                    <div class="project-links">
-                        <a href="https://github.com/SirSote/blaze" target="_blank">GitHub</a>
-                    </div>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">IN PROGRESS</span>
-                    <h3 class="project-title">SpekFrst</h3>
-                    <p class="project-desc">Audio courseware. You hear a field’s vocabulary as a playlist: term, definition, then the sentence it lives in. It is for learning by ear, not flashcards with a robot voice bolted on. Faceless. Still a method and a small player, not a store.</p>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">LOCAL</span>
-                    <h3 class="project-title">WorldView</h3>
-                    <p class="project-desc">A self-hosted map with a satellite-desk feel. MapLibre draws aircraft and satellite tracks from open data. FastAPI serves the feeds. Vite runs the page. No public repo yet.</p>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">LIVE</span>
-                    <h3 class="project-title">sirsote.com</h3>
-                    <p class="project-desc">This page. A project dashboard, not a menu of imaginary workflows. Written in Cursor, deployed with Vercel. The tools and projects here are the ones on the machine.</p>
-                    <div class="project-links">
-                        <a href="https://github.com/SirSote/sirsote-website" target="_blank">GitHub</a>
-                    </div>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">PARKED</span>
-                    <h3 class="project-title">Sote Choice</h3>
-                    <p class="project-desc">A premium apparel site. It is a finished public build, separate from the agent work. Left up as proof of a storefront, not as the current product.</p>
-                    <div class="project-links">
-                        <a href="https://github.com/SirSote/sotechoice-website" target="_blank">GitHub</a>
-                    </div>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">LOCAL</span>
-                    <h3 class="project-title">Solitaire</h3>
-                    <p class="project-desc">Klondike in the same dark green as the site. A small finished game used to keep the front-end hand warm. It lives in the vault and is not deployed.</p>
-                </div>
-            </div>
-            <div class="project-card">
-                <div class="project-content">
-                    <span class="project-status">STUDY</span>
-                    <h3 class="project-title">Connector chart</h3>
-                    <p class="project-desc">A visual page for cables, connectors, and ports. The page is written. The pictures are not on the server yet, so it stays off the public nav.</p>
-                </div>
             </div>
         </div>
     </section>
