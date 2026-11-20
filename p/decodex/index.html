@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>DecodeX</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="decodex.css">
+</head>
+<body>
+    <header>
+        <a class="mark" href="../../index.html">SirSote</a>
+        <span class="name">decodex</span>
+        <span id="where" data-state="local">this browser</span>
+    </header>
+    <main>
+        <section class="bench" aria-labelledby="bench-title">
+            <div class="bench-head">
+                <h1 id="bench-title">Caesar cipher</h1>
+                <div class="tools">
+                    <button type="button" id="copy-plain">Copy plain</button>
+                    <button type="button" id="copy-cipher">Copy cipher</button>
+                    <button type="button" id="clear-bench">Clear text</button>
+                </div>
+            </div>
+            <div class="panes">
+                <label class="pane">Plain
+                    <textarea id="plain" rows="8" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Type to encode"></textarea>
+                </label>
+                <div class="pipe">
+                    <button type="button" id="shift-down" aria-label="Lower shift">−</button>
+                    <label class="shift-label">Shift
+                        <input id="shift" type="number" min="0" max="25" step="1" value="3" inputmode="numeric">
+                    </label>
+                    <button type="button" id="shift-up" aria-label="Raise shift">+</button>
+                </div>
+                <label class="pane">Cipher
+                    <textarea id="cipher" rows="8" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" translate="no" placeholder="Type to decode"></textarea>
+                </label>
+            </div>
+            <p class="note">Letters move by the shift. Capitals stay capitals. Spaces, numbers, and punctuation stay put. Anyone who tries all twenty-six shifts can read a line.</p>
+        </section>
+
+        <section class="chats" aria-labelledby="chats-title">
+            <aside>
+                <h2 id="chats-title">Chats</h2>
+                <p class="note">Saved as ciphertext in this browser.</p>
+                <form id="new-chat">
+                    <label>Name
+                        <input id="chat-name" maxlength="40" autocomplete="off" placeholder="Room name">
+                    </label>
+                    <button type="submit">New chat</button>
+                </form>
+                <div id="rooms"></div>
+            </aside>
+            <div class="thread">
+                <div class="thread-head">
+                    <div>
+                        <h2 id="chat-title">No chat open</h2>
+                        <p id="chat-mode" class="note">A chat stays in this browser. The shift is not saved.</p>
+                    </div>
+                    <div class="tools">
+                        <label class="shift-label">Shift to read
+                            <input id="chat-shift" type="number" min="0" max="25" step="1" inputmode="numeric" autocomplete="off">
+                        </label>
+                        <button type="button" id="clear-convo">Clear all convo</button>
+                        <button type="button" id="copy-convo">Copy encoded</button>
+                        <button type="button" id="delete-chat">Delete chat</button>
+                    </div>
+                </div>
+                <ol id="log" class="log"></ol>
+                <form id="composer">
+                    <label class="grow">Line
+                        <textarea id="draft" rows="2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="true" placeholder="Write the line. Send stores it encoded."></textarea>
+                    </label>
+                    <div class="tools">
+                        <button type="submit">Send</button>
+                        <button type="button" id="add-encoded">Add encoded</button>
+                    </div>
+                </form>
+                <p id="chat-status" class="note" aria-live="polite"></p>
+            </div>
+        </section>
+        <noscript><p class="note">Turn on JavaScript. This page encodes in the browser and does not send the text anywhere.</p></noscript>
+    </main>
+    <script src="cipher.js"></script>
+    <script src="decodex.js"></script>
+</body>
+</html>
