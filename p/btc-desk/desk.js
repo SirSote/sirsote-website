@@ -22,6 +22,48 @@
     const STOP_PAD_ATR = 0.25;
     const TZ = "America/Phoenix";
 
+    const DAY_FAST = 21;
+    const DAY_SLOW = 200;
+
+    function sma(values, period) {
+        const out = new Array(values.length).fill(null);
+        if (values.length < period || period < 1) return out;
+        let sum = 0;
+        for (let i = 0; i < period; i++) sum += values[i];
+        out[period - 1] = sum / period;
+        for (let i = period; i < values.length; i++) {
+            sum += values[i] - values[i - period];
+            out[i] = sum / period;
+        }
+        return out;
+    }
+
+    function dailyLine(days, period, extendTo, fromTime) {
+        const averages = sma(days.map(function (day) { return day.close; }), period);
+        const points = [];
+        let prior = null;
+        for (let i = 0; i < days.length; i++) {
+            if (averages[i] == null) continue;
+            const point = { time: days[i].time, value: averages[i] };
+            if (fromTime && point.time < fromTime) {
+                prior = point;
+                continue;
+            }
+            if (prior) {
+                if (point.time > fromTime) points.push({ time: fromTime, value: prior.value });
+                prior = null;
+            }
+            points.push(point);
+        }
+        if (!points.length && prior) {
+            points.push({ time: fromTime, value: prior.value });
+        }
+        if (points.length && extendTo > points[points.length - 1].time) {
+            points.push({ time: extendTo, value: points[points.length - 1].value });
+        }
+        return points;
+    }
+
     function ema(values, period) {
         const out = new Array(values.length).fill(null);
         if (values.length < period || period < 1) return out;
@@ -360,6 +402,18 @@
             priceLineVisible: false,
             lastValueVisible: false,
         });
+        const dayFastLine = chart.addLineSeries({
+            color: "#5eb1ff",
+            lineWidth: 2,
+            priceLineVisible: false,
+            lastValueVisible: false,
+        });
+        const daySlowLine = chart.addLineSeries({
+            color: "#f4f4f4",
+            lineWidth: 2,
+            priceLineVisible: false,
+            lastValueVisible: false,
+        });
 
         const view = {
             h1: [],
@@ -380,6 +434,8 @@
                 ["4h EMA21", money(call.h4EmaFast)],
                 ["4h EMA55", money(call.h4EmaSlow)],
                 ["1h EMA21", money(call.h1EmaFast)],
+                ["21-day", view.dayFast == null ? "…" : money(view.dayFast)],
+                ["200-day", view.daySlow == null ? "…" : money(view.daySlow)],
                 ["1h RSI", call.h1Rsi.toFixed(1)],
                 ["1h ATR", money(call.h1Atr)],
             ];
@@ -394,6 +450,8 @@
                 dt.textContent = row[0];
                 dd.textContent = row[1];
                 if (row[0] === "4h trend") dd.dataset.regime = row[1];
+                if (row[0] === "21-day") dd.dataset.line = "day21";
+                if (row[0] === "200-day") dd.dataset.line = "day200";
                 factsEl.append(dt, dd);
             });
         }
@@ -418,6 +476,14 @@
             emaLine.setData(view.h1.map(function (c, i) {
                 return fast[i] == null ? null : { time: c.time, value: fast[i] };
             }).filter(Boolean));
+            const extendTo = bars.length ? bars[bars.length - 1].time : 0;
+            const fromTime = view.h1.length ? view.h1[0].time : 0;
+            const dayFast = dailyLine(view.days || [], DAY_FAST, extendTo, fromTime);
+            const daySlow = dailyLine(view.days || [], DAY_SLOW, extendTo, fromTime);
+            dayFastLine.setData(dayFast);
+            daySlowLine.setData(daySlow);
+            view.dayFast = dayFast.length ? dayFast[dayFast.length - 1].value : null;
+            view.daySlow = daySlow.length ? daySlow[daySlow.length - 1].value : null;
             if (view.marks) series.setMarkers(view.marks);
             if (!view.seen && bars.length) {
                 chart.timeScale().setVisibleLogicalRange({
@@ -437,12 +503,13 @@
         }
 
         async function refreshCandles() {
-            const [h1, h4] = await Promise.all([fetchOhlc(60), fetchOhlc(240)]);
+            const [h1, h4, days] = await Promise.all([fetchOhlc(60), fetchOhlc(240), fetchOhlc(1440)]);
             const hour = splitLive(h1);
             const four = splitLive(h4);
             view.h1 = hour.closed;
             view.forming = hour.live;
             view.h4 = four.closed;
+            view.days = splitLive(days).closed;
             view.call = evaluate(hour.closed, four.closed);
             view.marks = markers(hour.closed, four.closed);
             statusEl.textContent = "live";
@@ -474,6 +541,8 @@
     }
 
     return {
+        sma: sma,
+        dailyLine: dailyLine,
         ema: ema,
         rsi: rsi,
         atr: atr,

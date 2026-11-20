@@ -141,6 +141,8 @@ dd {
 dd[data-regime="LONG"] { color: var(--long); }
 dd[data-regime="SHORT"] { color: var(--short); }
 dd[data-regime="RANGE"] { color: var(--wait); }
+dd[data-line="day21"] { color: #5eb1ff; }
+dd[data-line="day200"] { color: #f4f4f4; }
 
 .note {
     color: var(--muted);
