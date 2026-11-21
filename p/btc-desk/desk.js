@@ -389,10 +389,11 @@
     }
 
     function mount(document) {
+        const chartEl = document.getElementById("chart");
+        if (!chartEl || typeof LightweightCharts === "undefined") return;
         const tickerEl = document.getElementById("ticker");
         const tickerLiveEl = document.getElementById("ticker-live");
         const statusEl = document.getElementById("status");
-        const chartEl = document.getElementById("chart");
         const chart = LightweightCharts.createChart(chartEl, {
             autoSize: true,
             layout: {
@@ -591,6 +592,7 @@
         markers: markers,
         splitLive: splitLive,
         bannerItems: bannerItems,
+        fetchOhlc: fetchOhlc,
         mount: mount,
     };
 });

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="32x32">
+    <title>Liquidity</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="liquidity.css?v=20261121b">
+    <link rel="stylesheet" href="/site-nav.css">
+    <link rel="stylesheet" href="/site-finish.css">
+</head>
+<body class="tool-page">
+    <div class="matrix-bg" aria-hidden="true"><canvas id="matrix"></canvas></div>
+    <nav class="site-nav" aria-label="Site">
+        <a href="/" class="logo">SirSote</a>
+        <ul class="nav-links">
+            <li><a href="/#about">About</a></li>
+            <li><a href="/#companies">Companies</a></li>
+            <li><a href="/#projects">Projects</a></li>
+            <li><a href="/#tools">Tools</a></li>
+            <li><a href="/p/decodex/">DecodeX</a></li>
+            <li><a href="/p/btc-desk/">BTC desk</a></li>
+            <li><a href="/p/liquidity/" aria-current="page">Liquidity</a></li>
+            <li><a href="/#certifications">Credentials</a></li>
+            <li><a href="/#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <header>
+        <span class="name">liquidity</span>
+    </header>
+    <section class="banner lean" aria-label="Desk lean">
+        <span id="lean-call" data-tone="wait">…</span>
+        <div class="lean-copy">
+            <p id="lean-text">Reading the desk.</p>
+            <p id="lean-why"></p>
+        </div>
+    </section>
+    <main>
+        <section id="book" class="book" aria-label="Market liquidity">
+            <div class="book-bar">
+                <span class="book-name">btc / usd</span>
+                <span id="book-status" class="feed" data-state="load">connecting</span>
+                <span class="legend"><i class="swatch heat"></i>size<i class="swatch buy"></i>buys<i class="swatch sell"></i>sells</span>
+                <div class="ranges" role="group" aria-label="Price window in dollars">
+                    <button type="button" data-mode="tight">±30</button>
+                    <button type="button" data-mode="near" aria-pressed="true">±100</button>
+                    <button type="button" data-mode="wide">±250</button>
+                    <button type="button" data-mode="far">±500</button>
+                </div>
+                <dl class="gains">
+                    <div><dt>Today</dt><dd id="gain-day">…</dd></div>
+                    <div><dt>Since load</dt><dd id="gain-load">…</dd></div>
+                    <div><dt>10m delta</dt><dd id="gain-delta">…</dd></div>
+                    <div><dt>Book</dt><dd id="gain-book">…</dd></div>
+                    <div><dt>Spread</dt><dd id="gain-spread">…</dd></div>
+                    <div><dt>Bid wall</dt><dd id="wall-bid">…</dd></div>
+                    <div><dt>Ask wall</dt><dd id="wall-ask">…</dd></div>
+                </dl>
+            </div>
+            <canvas id="book-canvas" aria-hidden="true"></canvas>
+            <p id="book-hover" class="book-hover">Hover the book. Brighter bands are more coin resting. Dots are trades.</p>
+        </section>
+    </main>
+    <script src="/p/btc-desk/desk.js?v=20261121b"></script>
+    <script src="book.js?v=20261121b"></script>
+    <script src="signal.js?v=20261121b"></script>
+    <script src="/site-matrix.js"></script>
+</body>
+</html>

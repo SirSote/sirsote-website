@@ -158,6 +158,23 @@ assert.strictEqual(book.hitTest(box, 200, 10, view, grid, [], 0, 1000), null);
 assert.ok(book.hoverText(null).includes("Hover"));
 assert.ok(book.hoverText({ price: 100, t: 1, bidQty: 2, askQty: 0 }, "1:00 PM").includes("bid"));
 
+const shortWait = { call: "WAIT", regime: "SHORT", why: "waiting under the average" };
+const agreed = book.prejudge(shortWait, { share: 0.3, deltaQty: -1.2, bidWall: { price: 59000, qty: 4 } });
+assert.strictEqual(agreed.path, "down");
+assert.strictEqual(agreed.book, "down");
+assert.ok(agreed.text.includes("waiting on a short"));
+assert.ok(agreed.text.includes("book agrees"));
+assert.ok(agreed.text.includes("59,000"));
+const fight = book.prejudge({ call: "SHORT", regime: "SHORT" }, { share: 0.7, deltaQty: 2 });
+assert.strictEqual(fight.path, "flat");
+assert.ok(fight.text.includes("not confirmed"));
+const quiet = book.prejudge({ call: "STAND ASIDE", regime: "RANGE" }, { share: 0.5, deltaQty: 0.1 });
+assert.strictEqual(quiet.path, "flat");
+assert.ok(quiet.text.includes("No path"));
+const bookOnly = book.prejudge({ call: "STAND ASIDE", regime: "RANGE" }, { share: 0.8, deltaQty: 1 });
+assert.strictEqual(bookOnly.path, "up");
+assert.ok(bookOnly.text.includes("short-term"));
+
 assert.strictEqual(book.priceStep(700), 100);
 
 console.log("book liquidity ok");

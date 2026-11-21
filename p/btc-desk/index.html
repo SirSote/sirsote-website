@@ -10,11 +10,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="desk.css?v=20261121">
+    <link rel="stylesheet" href="desk.css?v=20261121b">
     <link rel="stylesheet" href="/site-nav.css">
     <link rel="stylesheet" href="/site-finish.css">
 </head>
-<body class="tool-page" data-view="both">
+<body class="tool-page">
     <div class="matrix-bg" aria-hidden="true"><canvas id="matrix"></canvas></div>
     <nav class="site-nav" aria-label="Site">
         <a href="/" class="logo">SirSote</a>
@@ -25,17 +25,13 @@
             <li><a href="/#tools">Tools</a></li>
             <li><a href="/p/decodex/">DecodeX</a></li>
             <li><a href="/p/btc-desk/" aria-current="page">BTC desk</a></li>
+            <li><a href="/p/liquidity/">Liquidity</a></li>
             <li><a href="/#certifications">Credentials</a></li>
             <li><a href="/#contact">Contact</a></li>
         </ul>
     </nav>
     <header>
         <span class="name">btc desk</span>
-        <div class="views" role="group" aria-label="Desk view">
-            <button type="button" data-view="both" aria-pressed="true">Both</button>
-            <button type="button" data-view="chart">Chart</button>
-            <button type="button" data-view="book">Book</button>
-        </div>
         <span id="status" data-state="load">connecting</span>
     </header>
     <section class="banner ticker" aria-label="Desk readings">
@@ -45,37 +41,10 @@
         <p id="ticker-live" class="sr-only" aria-live="polite">Reading the last closed hour.</p>
     </section>
     <main>
-        <div class="stack">
-            <div id="chart"></div>
-            <section id="book" class="book" aria-label="Market liquidity">
-                <div class="book-bar">
-                    <span class="book-name">liquidity</span>
-                    <span id="book-status" class="feed" data-state="load">connecting</span>
-                    <span class="legend"><i class="swatch heat"></i>size<i class="swatch buy"></i>buys<i class="swatch sell"></i>sells</span>
-                    <div class="ranges" role="group" aria-label="Price window in dollars">
-                        <button type="button" data-mode="tight">±30</button>
-                        <button type="button" data-mode="near" aria-pressed="true">±100</button>
-                        <button type="button" data-mode="wide">±250</button>
-                        <button type="button" data-mode="far">±500</button>
-                    </div>
-                    <dl class="gains">
-                        <div><dt>Today</dt><dd id="gain-day">…</dd></div>
-                        <div><dt>Since load</dt><dd id="gain-load">…</dd></div>
-                        <div><dt>10m delta</dt><dd id="gain-delta">…</dd></div>
-                        <div><dt>Book</dt><dd id="gain-book">…</dd></div>
-                        <div><dt>Spread</dt><dd id="gain-spread">…</dd></div>
-                        <div><dt>Bid wall</dt><dd id="wall-bid">…</dd></div>
-                        <div><dt>Ask wall</dt><dd id="wall-ask">…</dd></div>
-                    </dl>
-                </div>
-                <canvas id="book-canvas" aria-hidden="true"></canvas>
-                <p id="book-hover" class="book-hover">Hover the book. Brighter bands are more coin resting. Dots are trades.</p>
-            </section>
-        </div>
+        <div id="chart"></div>
     </main>
     <script src="lightweight-charts.js"></script>
-    <script src="desk.js?v=20261121"></script>
-    <script src="book.js"></script>
+    <script src="desk.js?v=20261121b"></script>
     <script src="/site-matrix.js"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-/* Live Kraken book for the BTC desk.
-   Heatmap, prints, and the day's move. This page never sends an order. */
+/* Live Kraken book. Heatmap, prints, and the day's move.
+   The desk call is a prior. This page never sends an order. */
 (function (factory) {
     const api = factory();
     if (typeof module !== "undefined" && module.exports) module.exports = api;
@@ -20,6 +20,75 @@
     const PRICE_WINDOW = { tight: 60, near: 200, wide: 500, far: 1000 };
     const TZ = "America/Phoenix";
     const PAIR = "BTC/USD";
+    let latestCall = null;
+    const callListeners = [];
+
+    function publishCall(call) {
+        latestCall = call;
+        for (let i = 0; i < callListeners.length; i++) callListeners[i](call);
+    }
+
+    function onCall(fn) {
+        callListeners.push(fn);
+        if (latestCall) fn(latestCall);
+    }
+
+    function deskLean(call) {
+        if (!call) return "flat";
+        if (call.call === "LONG") return "up";
+        if (call.call === "SHORT") return "down";
+        if (call.call === "WAIT" && call.regime === "LONG") return "up";
+        if (call.call === "WAIT" && call.regime === "SHORT") return "down";
+        return "flat";
+    }
+
+    function bookLean(share, deltaQty) {
+        if (share == null || !Number.isFinite(share) || !Number.isFinite(deltaQty)) return "flat";
+        if (share >= 0.55 && deltaQty >= 0) return "up";
+        if (share <= 0.45 && deltaQty <= 0) return "down";
+        return "flat";
+    }
+
+    function deskPhrase(call) {
+        if (!call) return "The desk has not called yet";
+        if (call.call === "LONG") return "The desk calls long";
+        if (call.call === "SHORT") return "The desk calls short";
+        if (call.call === "WAIT" && call.regime === "LONG") return "The desk is waiting on a long";
+        if (call.call === "WAIT" && call.regime === "SHORT") return "The desk is waiting on a short";
+        return "The desk is standing aside";
+    }
+
+    function prejudge(call, book) {
+        const tape = book || {};
+        const desk = deskLean(call);
+        const side = bookLean(tape.share, tape.deltaQty);
+        const phrase = deskPhrase(call);
+        let path = "flat";
+        let text;
+        if (!call) {
+            text = phrase + ".";
+        } else if (desk === "flat" && side === "flat") {
+            text = phrase + ", and the book is two-sided. No path yet.";
+        } else if (desk === "flat") {
+            path = side;
+            text = phrase + ". The book alone leans " + side + ", so that is only a short-term read.";
+        } else if (side === "flat") {
+            path = desk;
+            text = phrase + ". The book has not confirmed it.";
+        } else if (desk === side) {
+            path = desk;
+            text = phrase + ", and the book agrees. Path is " + side + ".";
+        } else {
+            text = phrase + ", but the book is leaning " + side + ". The move is not confirmed.";
+        }
+        if (path === "down" && tape.bidWall) {
+            text += " A bid wall at " + formatPrice(tape.bidWall.price) + " can catch the drop.";
+        }
+        if (path === "up" && tape.askWall) {
+            text += " An ask wall at " + formatPrice(tape.askWall.price) + " can stall the rise.";
+        }
+        return { desk: desk, book: side, path: path, text: text };
+    }
 
     function lerp(a, b, t) {
         return a + (b - a) * t;
@@ -574,6 +643,7 @@ function pruneTrades(tape, cutoff) {
     }
 
     function prepare(document) {
+        if (!document.querySelector(".views button")) return null;
         let name = "both";
         try {
             const saved = sessionStorage.getItem("btc-desk-view");
@@ -651,7 +721,7 @@ function pruneTrades(tape, cutoff) {
         });
 
         try {
-            const savedMode = sessionStorage.getItem("btc-desk-book-mode");
+            const savedMode = sessionStorage.getItem("liquidity-book-mode");
             if (savedMode === "tight" || savedMode === "near" || savedMode === "wide" || savedMode === "far") state.mode = savedMode;
         } catch (error) { /* storage off */ }
 
@@ -693,6 +763,47 @@ function pruneTrades(tape, cutoff) {
             }
             if (bidWallEl) bidWallEl.textContent = bidWall ? formatPrice(bidWall.price) + " · " + formatCoin(bidWall.qty) : "—";
             if (askWallEl) askWallEl.textContent = askWall ? formatPrice(askWall.price) + " · " + formatCoin(askWall.qty) : "—";
+            paintLean(share, flow.qty, bidWall, askWall);
+        }
+
+        function paintLean(share, deltaQty, bidWall, askWall) {
+            const callEl = document.getElementById("lean-call");
+            const textEl = document.getElementById("lean-text");
+            const whyEl = document.getElementById("lean-why");
+            if (!textEl) return;
+            const read = prejudge(state.call, {
+                share: share,
+                deltaQty: deltaQty,
+                bidWall: bidWall,
+                askWall: askWall,
+            });
+            if (callEl) {
+                callEl.textContent = state.call ? state.call.call : "…";
+                callEl.dataset.tone = state.call ? state.call.call.toLowerCase().replace(/\s+/g, "-") : "wait";
+            }
+            textEl.textContent = read.text;
+            textEl.dataset.path = read.path;
+            textEl.dataset.ready = "yes";
+            if (whyEl) whyEl.textContent = state.call && state.call.why ? state.call.why : "";
+        }
+
+        function markLevel(ctx, price, color, label) {
+            if (price == null || price < state.view.low || price > state.view.high) return;
+            const y = yOf(price);
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = Math.max(1, box.dpr);
+            ctx.setLineDash([6 * box.dpr, 4 * box.dpr]);
+            ctx.beginPath();
+            ctx.moveTo(box.plotX, y);
+            ctx.lineTo(box.plotRight, y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.fillStyle = color;
+            ctx.textAlign = "left";
+            ctx.textBaseline = "bottom";
+            ctx.fillText(label, box.plotX + 8 * box.dpr, y - 3 * box.dpr);
+            ctx.restore();
         }
 
         function fail(error) {
@@ -825,6 +936,11 @@ function pruneTrades(tape, cutoff) {
                 ctx.arc(x, y, tradeRadius(trade.qty, tradeCap, dpr), 0, Math.PI * 2);
                 ctx.fill();
             }
+            if (state.call) {
+                markLevel(ctx, state.call.h1EmaFast, "#f5c542", "1h EMA21");
+                markLevel(ctx, state.call.invalid, "#ff3366", "invalid");
+                markLevel(ctx, state.call.reward2r, "#00ff88", "2R");
+            }
             ctx.restore();
 
             const range = bookRange(state.book);
@@ -956,7 +1072,7 @@ function pruneTrades(tape, cutoff) {
                 for (let j = 0; j < modeButtons.length; j++) {
                     modeButtons[j].setAttribute("aria-pressed", modeButtons[j].dataset.mode === state.mode ? "true" : "false");
                 }
-                try { sessionStorage.setItem("btc-desk-book-mode", state.mode); } catch (error) {}
+                try { sessionStorage.setItem("liquidity-book-mode", state.mode); } catch (error) {}
                 heatKey = "";
                 scheduleDraw();
             });
@@ -1014,6 +1130,13 @@ function pruneTrades(tape, cutoff) {
             clearInterval(restTimer);
             restTimer = 0;
         }
+
+        state.call = latestCall;
+        onCall(function (call) {
+            state.call = call;
+            paintStats();
+            scheduleDraw();
+        });
 
         function connect() {
             if (stopped) return;
@@ -1159,6 +1282,8 @@ function pruneTrades(tape, cutoff) {
         parseTicker: parseTicker,
         hitTest: hitTest,
         hoverText: hoverText,
+        prejudge: prejudge,
+        publishCall: publishCall,
         setDeskView: setDeskView,
         prepare: prepare,
         mount: mount,
