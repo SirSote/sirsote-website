@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="/site-nav.css">
     <link rel="stylesheet" href="/site-finish.css">
 </head>
-<body class="tool-page">
+<body class="tool-page" data-view="both">
     <div class="matrix-bg" aria-hidden="true"><canvas id="matrix"></canvas></div>
     <nav class="site-nav" aria-label="Site">
         <a href="/" class="logo">SirSote</a>
@@ -31,6 +31,11 @@
     </nav>
     <header>
         <span class="name">btc desk</span>
+        <div class="views" role="group" aria-label="Desk view">
+            <button type="button" data-view="both" aria-pressed="true">Both</button>
+            <button type="button" data-view="chart">Chart</button>
+            <button type="button" data-view="book">Book</button>
+        </div>
         <span id="status" data-state="load">connecting</span>
         <span id="live" class="live">…</span>
     </header>
@@ -39,14 +44,41 @@
         <p id="why" class="why">Reading the last closed hour.</p>
     </section>
     <main>
-        <div id="chart"></div>
+        <div class="stack">
+            <div id="chart"></div>
+            <section id="book" class="book" aria-label="Market liquidity">
+                <div class="book-bar">
+                    <span class="book-name">liquidity</span>
+                    <span id="book-status" class="feed" data-state="load">connecting</span>
+                    <span class="legend"><i class="swatch heat"></i>size<i class="swatch buy"></i>buys<i class="swatch sell"></i>sells</span>
+                    <div class="ranges" role="group" aria-label="Price window in dollars">
+                        <button type="button" data-mode="tight">±30</button>
+                        <button type="button" data-mode="near" aria-pressed="true">±100</button>
+                        <button type="button" data-mode="wide">±250</button>
+                        <button type="button" data-mode="far">±500</button>
+                    </div>
+                    <dl class="gains">
+                        <div><dt>Today</dt><dd id="gain-day">…</dd></div>
+                        <div><dt>Since load</dt><dd id="gain-load">…</dd></div>
+                        <div><dt>10m delta</dt><dd id="gain-delta">…</dd></div>
+                        <div><dt>Book</dt><dd id="gain-book">…</dd></div>
+                        <div><dt>Spread</dt><dd id="gain-spread">…</dd></div>
+                        <div><dt>Bid wall</dt><dd id="wall-bid">…</dd></div>
+                        <div><dt>Ask wall</dt><dd id="wall-ask">…</dd></div>
+                    </dl>
+                </div>
+                <canvas id="book-canvas" aria-hidden="true"></canvas>
+                <p id="book-hover" class="book-hover">Hover the book. Brighter bands are more coin resting. Dots are trades.</p>
+            </section>
+        </div>
         <aside>
             <dl id="facts"></dl>
-            <p class="note">Yellow is the 1-hour EMA21. Blue is the 21-day average. White is the 200-day average. Arrows are hours the rules called long or short. The number up top is the live trade. The call uses the last closed hour. Nothing on this page sends an order.</p>
+            <p class="note">Yellow is the 1-hour EMA21. Blue is the 21-day average. White is the 200-day average. Arrows are hours the rules called long or short. The lower panel records the Kraken book. Brighter bands are more coin resting at that price. The white line is the last trade. Green dots bought, red dots sold. The line under the book is ten minutes of buy volume minus sell volume. Today is the move from the daily open. The number up top is the live trade. The call uses the last closed hour. Nothing on this page sends an order.</p>
         </aside>
     </main>
     <script src="lightweight-charts.js"></script>
     <script src="desk.js"></script>
+    <script src="book.js"></script>
     <script src="/site-matrix.js"></script>
 </body>
 </html>

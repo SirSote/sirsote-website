@@ -520,7 +520,12 @@
         async function refreshTicker() {
             view.livePrice = await fetchTicker();
             if (liveEl) liveEl.textContent = money(view.livePrice);
-            if (view.h1.length) drawLive();
+            if (!view.h1.length) return;
+            if (view.call && statusEl.dataset.state !== "live") {
+                statusEl.textContent = "live";
+                statusEl.dataset.state = "live";
+            }
+            drawLive();
         }
 
         async function tick(kind) {
