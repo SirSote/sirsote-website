@@ -63,10 +63,12 @@
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 1.5rem 2rem;
+            padding: 1.1rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 1rem 1.5rem;
+            flex-wrap: wrap;
             background: rgba(10, 10, 10, 0.9);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
@@ -96,16 +98,18 @@
 
         .nav-links {
             display: flex;
-            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            gap: 0.7rem 1.15rem;
             list-style: none;
         }
 
         .nav-links a {
             color: var(--text-secondary);
             text-decoration: none;
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.06em;
             transition: color 0.3s;
         }
 
@@ -650,7 +654,8 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .nav-links { display: none; }
+            nav { align-items: flex-start; }
+            .nav-links { justify-content: flex-start; width: 100%; }
             .hero {
                 flex-direction: column;
                 align-items: stretch;
@@ -683,6 +688,8 @@
             <li><a href="#companies">Companies</a></li>
             <li><a href="#projects">Projects</a></li>
             <li><a href="#tools">Tools</a></li>
+            <li><a href="/p/decodex/">DecodeX</a></li>
+            <li><a href="/p/btc-desk/">BTC desk</a></li>
             <li><a href="#certifications">Credentials</a></li>
             <li><a href="#contact">Contact</a></li>
         </ul>
@@ -775,6 +782,26 @@
         <div class="projects-grid">
             <div class="project-card">
                 <div class="project-content">
+                    <span class="project-status">LIVE</span>
+                    <h3 class="project-title">DecodeX</h3>
+                    <p class="project-desc">A Caesar cipher and private chats on this site. A line you send is saved as ciphertext in the browser. Clear all convo drops the readable text and keeps the code.</p>
+                    <div class="project-links">
+                        <a href="/p/decodex/">Open DecodeX</a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
+                    <span class="project-status">LIVE</span>
+                    <h3 class="project-title">BTC desk</h3>
+                    <p class="project-desc">A Kraken XBTUSD chart with the 1-hour EMA21, the 21-day average, and the 200-day average. The call uses the last closed hour. Nothing on the page sends an order.</p>
+                    <div class="project-links">
+                        <a href="/p/btc-desk/">Open the desk</a>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-content">
                     <span class="project-status">IN PROGRESS</span>
                     <h3 class="project-title">Echo</h3>
                     <p class="project-desc">A client intake chat. Someone describes the job, Claude drafts the requirements, and Resend can send the follow-up. The frontend is Next.js on Vercel. The public repo is ahead of a clean key rotation, so the live chat host is not the brag yet.</p>
@@ -803,9 +830,12 @@
             </div>
             <div class="project-card">
                 <div class="project-content">
-                    <span class="project-status">IN PROGRESS</span>
+                    <span class="project-status">LIVE</span>
                     <h3 class="project-title">SpekFrst</h3>
-                    <p class="project-desc">Audio courseware. You hear a field’s vocabulary as a playlist: term, definition, then the sentence it lives in. It is for learning by ear, not flashcards with a robot voice bolted on. Faceless. Still a method and a small player, not a store.</p>
+                    <p class="project-desc">The public site is up. The page on the domain is the ministry site, and the cart is still at the press. The listen work is vocabulary by ear: term, definition, then the sentence it lives in.</p>
+                    <div class="project-links">
+                        <a href="https://spekfrst.com" target="_blank" rel="noopener">spekfrst.com</a>
+                    </div>
                 </div>
             </div>
             <div class="project-card">
