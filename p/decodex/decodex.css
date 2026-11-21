@@ -30,7 +30,7 @@ header {
     gap: 1rem;
     padding: 0.85rem 1.25rem;
     border-bottom: 1px solid var(--line);
-    background: rgba(10, 10, 10, 0.94);
+    background: rgba(10, 10, 10, 0.55);
 }
 .mark {
     font-family: "JetBrains Mono", monospace;
@@ -95,7 +95,7 @@ button:hover { border-color: var(--long); color: var(--long); }
 .bench {
     padding: 1rem 1.25rem 0.9rem;
     border-bottom: 1px solid var(--line);
-    background: var(--panel);
+    background: rgba(17, 17, 17, 0.62);
 }
 .bench-head, .thread-head {
     display: flex;
@@ -162,7 +162,7 @@ textarea:focus, input:focus { border-color: var(--long); outline: none; }
 }
 aside {
     border-right: 1px solid var(--line);
-    background: var(--ink);
+    background: rgba(13, 13, 13, 0.55);
     padding: 0.9rem;
     overflow: auto;
     display: flex;
@@ -186,7 +186,7 @@ aside {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto auto;
     min-height: 0;
-    background: var(--bg);
+    background: transparent;
 }
 .thread-head { padding: 0.9rem 1rem 0.4rem; margin: 0; }
 .log {
@@ -202,7 +202,7 @@ aside {
     max-width: min(40rem, 100%);
     border: 1px solid var(--line);
     padding: 0.55rem 0.7rem 0.45rem;
-    background: var(--panel);
+    background: rgba(17, 17, 17, 0.82);
 }
 .msg.you { margin-left: auto; border-color: #1d4a36; }
 .who {

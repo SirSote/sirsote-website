@@ -1,0 +1,30 @@
+/* Homepage texture: matrix rain behind the page, green scanlines over it. */
+.matrix-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.15;
+}
+
+body.tool-page::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 255, 136, 0.03) 2px, rgba(0, 255, 136, 0.03) 4px);
+    z-index: 1000;
+}
+
+body.tool-page > header,
+body.tool-page > main,
+body.tool-page > .banner {
+    position: relative;
+    z-index: 1;
+}
