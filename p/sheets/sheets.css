@@ -21,9 +21,12 @@ header, main { position: relative; z-index: 1; }
 header {
     display: flex;
     align-items: baseline;
+    justify-content: center;
     gap: 1rem;
-    padding: 0.85rem 1.25rem;
+    padding: 0.85rem 0;
     border-bottom: 1px solid var(--line);
+    width: min(960px, 100%);
+    margin: 0 auto;
 }
 
 .name {
@@ -42,8 +45,9 @@ h1 {
 main {
     display: grid;
     gap: 1.25rem;
-    padding: 1.25rem;
-    max-width: 960px;
+    padding: 1.25rem 0 2rem;
+    width: min(960px, 100%);
+    margin: 0 auto;
 }
 
 .sheet, figure {
