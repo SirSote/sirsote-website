@@ -1,0 +1,75 @@
+/* Same header as the homepage: flashing prompt, logo on the left, menu on the right. */
+.site-nav {
+    --accent: #00ff88;
+    --text-secondary: #888888;
+    --border: #2a2a2a;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1.1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem 1.5rem;
+    flex-wrap: wrap;
+    background: rgba(10, 10, 10, 0.9);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    z-index: 200;
+    box-sizing: border-box;
+}
+
+.site-nav .logo {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.site-nav .logo::before {
+    content: ">";
+    animation: site-nav-blink 1s infinite;
+}
+
+@keyframes site-nav-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+.site-nav .nav-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.7rem 1.15rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.site-nav .nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-family: "Space Grotesk", sans-serif;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: color 0.3s;
+}
+
+.site-nav .nav-links a:hover,
+.site-nav .nav-links a[aria-current="page"] {
+    color: var(--accent);
+}
+
+body.tool-page { padding-top: 4.85rem; }
+
+@media (max-width: 900px) {
+    .site-nav { align-items: flex-start; }
+    .site-nav .nav-links { justify-content: flex-start; width: 100%; }
+    body.tool-page { padding-top: 8.8rem; }
+}
