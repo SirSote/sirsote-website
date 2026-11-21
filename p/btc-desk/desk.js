@@ -360,11 +360,37 @@
         }).format(new Date(epoch * 1000));
     }
 
+    function bannerItems(call, extras) {
+        const live = extras || {};
+        const items = [
+            { kind: "call", text: call.call, tone: call.call.toLowerCase().replace(/\s+/g, "-") },
+            { kind: "why", text: call.why },
+            { kind: "fact", label: "Live", text: live.liveText || "…" },
+            { kind: "fact", label: "Closed hour", text: money(call.price) },
+            { kind: "fact", label: "Hour", text: when(call.candleTime) },
+            { kind: "fact", label: "4h trend", text: call.regime, tone: call.regime },
+            { kind: "fact", label: "4h EMA21", text: money(call.h4EmaFast) },
+            { kind: "fact", label: "4h EMA55", text: money(call.h4EmaSlow) },
+            { kind: "fact", label: "1h EMA21", text: money(call.h1EmaFast) },
+            { kind: "fact", label: "21-day", text: live.dayFast || "…", line: "day21" },
+            { kind: "fact", label: "200-day", text: live.daySlow || "…", line: "day200" },
+            { kind: "fact", label: "1h RSI", text: call.h1Rsi.toFixed(1) },
+            { kind: "fact", label: "1h ATR", text: money(call.h1Atr) },
+        ];
+        if (call.invalid != null) {
+            items.push({ kind: "fact", label: "Invalid", text: money(call.invalid) });
+            items.push({ kind: "fact", label: "2R sketch", text: money(call.reward2r) });
+        }
+        items.push({
+            kind: "why",
+            text: "Yellow is the 1-hour EMA21. Blue is the 21-day. White is the 200-day. Nothing on this page sends an order.",
+        });
+        return items;
+    }
+
     function mount(document) {
-        const callEl = document.getElementById("call");
-        const whyEl = document.getElementById("why");
-        const liveEl = document.getElementById("live");
-        const factsEl = document.getElementById("facts");
+        const tickerEl = document.getElementById("ticker");
+        const tickerLiveEl = document.getElementById("ticker-live");
         const statusEl = document.getElementById("status");
         const chartEl = document.getElementById("chart");
         const chart = LightweightCharts.createChart(chartEl, {
@@ -421,39 +447,48 @@
             seen: false,
         };
 
+        function renderTicker(items) {
+            if (!tickerEl) return;
+            tickerEl.replaceChildren();
+            for (let copy = 0; copy < 2; copy++) {
+                const seq = document.createElement("div");
+                seq.className = "ticker-seq";
+                if (copy === 1) seq.setAttribute("aria-hidden", "true");
+                items.forEach(function (item) {
+                    const span = document.createElement("span");
+                    span.className = "ticker-item " + item.kind;
+                    if (item.label) {
+                        const label = document.createElement("span");
+                        label.className = "k";
+                        label.textContent = item.label;
+                        span.append(label);
+                    }
+                    const value = document.createElement("span");
+                    value.textContent = item.text;
+                    if (item.tone) value.dataset.tone = item.tone;
+                    if (item.line) value.dataset.line = item.line;
+                    span.append(value);
+                    seq.append(span);
+                });
+                tickerEl.append(seq);
+            }
+            if (tickerLiveEl) {
+                const callItem = items.filter(function (item) { return item.kind === "call"; })[0];
+                const priceItem = items.filter(function (item) { return item.label === "Live"; })[0];
+                const parts = [];
+                if (callItem) parts.push(callItem.text);
+                if (priceItem) parts.push(priceItem.label + " " + priceItem.text);
+                tickerLiveEl.textContent = parts.join(". ");
+            }
+        }
+
         function paint(call) {
             view.call = call;
-            callEl.textContent = call.call;
-            callEl.className = "call " + call.call.toLowerCase().replace(/\s+/g, "-");
-            whyEl.textContent = call.why;
-            const rows = [
-                ["Live", view.livePrice == null ? "…" : money(view.livePrice)],
-                ["Closed hour", money(call.price)],
-                ["Hour", when(call.candleTime)],
-                ["4h trend", call.regime],
-                ["4h EMA21", money(call.h4EmaFast)],
-                ["4h EMA55", money(call.h4EmaSlow)],
-                ["1h EMA21", money(call.h1EmaFast)],
-                ["21-day", view.dayFast == null ? "…" : money(view.dayFast)],
-                ["200-day", view.daySlow == null ? "…" : money(view.daySlow)],
-                ["1h RSI", call.h1Rsi.toFixed(1)],
-                ["1h ATR", money(call.h1Atr)],
-            ];
-            if (call.invalid != null) {
-                rows.push(["Invalid", money(call.invalid)]);
-                rows.push(["2R sketch", money(call.reward2r)]);
-            }
-            factsEl.replaceChildren();
-            rows.forEach(function (row) {
-                const dt = document.createElement("dt");
-                const dd = document.createElement("dd");
-                dt.textContent = row[0];
-                dd.textContent = row[1];
-                if (row[0] === "4h trend") dd.dataset.regime = row[1];
-                if (row[0] === "21-day") dd.dataset.line = "day21";
-                if (row[0] === "200-day") dd.dataset.line = "day200";
-                factsEl.append(dt, dd);
-            });
+            renderTicker(bannerItems(call, {
+                liveText: view.livePrice == null ? "…" : money(view.livePrice),
+                dayFast: view.dayFast == null ? "…" : money(view.dayFast),
+                daySlow: view.daySlow == null ? "…" : money(view.daySlow),
+            }));
         }
 
         function barsForChart() {
@@ -519,7 +554,6 @@
 
         async function refreshTicker() {
             view.livePrice = await fetchTicker();
-            if (liveEl) liveEl.textContent = money(view.livePrice);
             if (!view.h1.length) return;
             if (view.call && statusEl.dataset.state !== "live") {
                 statusEl.textContent = "live";
@@ -535,7 +569,7 @@
             } catch (error) {
                 statusEl.textContent = "reconnect";
                 statusEl.dataset.state = "down";
-                whyEl.textContent = error.message;
+                renderTicker([{ kind: "why", text: error.message }]);
             }
         }
 
@@ -556,6 +590,7 @@
         evaluate: evaluate,
         markers: markers,
         splitLive: splitLive,
+        bannerItems: bannerItems,
         mount: mount,
     };
 });
