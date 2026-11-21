@@ -1,0 +1,105 @@
+:root {
+    --bg: #0a0a0a;
+    --panel: #111111;
+    --line: #2a2a2a;
+    --text: #f4f4f4;
+    --muted: #8d8d8d;
+    --long: #00ff88;
+}
+
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    padding-top: 5.4rem;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Space Grotesk", sans-serif;
+    min-height: 100vh;
+}
+
+header, main { position: relative; z-index: 1; }
+
+header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+}
+
+.name {
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-size: 0.78rem;
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 500;
+}
+
+.note {
+    color: var(--muted);
+    max-width: 40rem;
+}
+
+main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 18rem;
+    gap: 1.5rem;
+    padding: 1.25rem;
+}
+
+form, .watch, .result {
+    background: rgba(17, 17, 17, 0.86);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 1rem;
+}
+
+form {
+    display: flex;
+    gap: 0.6rem;
+    grid-column: 1;
+}
+
+input, button {
+    font: inherit;
+    color: var(--text);
+    background: #0a0a0a;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 0.7rem 0.8rem;
+}
+
+input { flex: 1; min-width: 0; }
+button { cursor: pointer; }
+button.primary { background: var(--long); color: #04140c; border-color: var(--long); font-weight: 700; }
+
+.result {
+    grid-column: 1;
+    white-space: pre-wrap;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    min-height: 8rem;
+}
+
+.watch { grid-column: 2; grid-row: 1 / span 3; }
+.watch h2 { margin: 0 0 0.8rem; font-size: 1rem; }
+.watch ul { list-style: none; padding: 0; margin: 0; }
+.watch li { margin: 0 0 0.7rem; }
+.watch button {
+    display: block;
+    width: 100%;
+    text-align: left;
+    margin-top: 0.3rem;
+}
+.addr { word-break: break-all; font-family: "JetBrains Mono", monospace; font-size: 0.75rem; }
+
+@media (max-width: 800px) {
+    main { grid-template-columns: 1fr; }
+    .watch { grid-column: 1; grid-row: auto; }
+}
