@@ -14,12 +14,12 @@
     const EMA_SLOW = 55;
     const RSI_PERIOD = 14;
     const ATR_PERIOD = 14;
-    const TREND_GAP = 0.0015;
-    const RSI_LOW = 38;
-    const RSI_HIGH = 62;
-    const RSI_STRETCHED = 68;
-    const EMA_TAG = 0.001;
-    const STOP_PAD_ATR = 0.25;
+    const ADX_PERIOD = 14;
+    const ADX_MIN = 25;
+    const VOL_PERIOD = 20;
+    const RSI_LONG = [40, 50];
+    const RSI_SHORT = [50, 60];
+    const STOP_ATR = 1.5;
     const TZ = "America/Phoenix";
 
     const DAY_FAST = 21;
@@ -126,39 +126,81 @@
         return out;
     }
 
-    function regime(close, fast, slow) {
-        const gap = slow ? (fast - slow) / slow : 0;
-        if (close > fast && fast > slow && gap >= TREND_GAP) return "LONG";
-        if (close < fast && fast < slow && gap <= -TREND_GAP) return "SHORT";
+    function direction(fast, slow) {
+        if (fast > slow) return "LONG";
+        if (fast < slow) return "SHORT";
         return "RANGE";
     }
 
-    function levels(side, price, swing, barAtr) {
-        const pad = STOP_PAD_ATR * barAtr;
-        if (side === "LONG") {
-            let invalid = swing - pad;
-            if (invalid >= price) invalid = price - barAtr;
-            const risk = price - invalid;
-            return { invalid: invalid, reward2r: price + 2 * risk };
-        }
-        let invalid = swing + pad;
-        if (invalid <= price) invalid = price + barAtr;
-        const risk = invalid - price;
-        return { invalid: invalid, reward2r: price - 2 * risk };
+    function regime(close, fast, slow, adxValue) {
+        if (adxValue == null || adxValue <= ADX_MIN) return "RANGE";
+        return direction(fast, slow);
     }
 
-    function unconfirmed(withTrend, rsiMid, rsiTurning, rsiValue, up) {
-        const gaps = [];
-        if (!withTrend) gaps.push("the hour closed the wrong way");
-        if (!rsiMid) gaps.push("RSI is " + rsiValue.toFixed(1) + ", outside 38–62");
-        if (!rsiTurning) gaps.push("RSI is not turning " + (up ? "up" : "down"));
-        if (!gaps.length) return "the 1h bar did not confirm.";
-        if (gaps.length === 1) return gaps[0] + ".";
-        return gaps.slice(0, -1).join(", ") + ", and " + gaps[gaps.length - 1] + ".";
+    function adx(candles, period) {
+        const length = period || ADX_PERIOD;
+        const out = new Array(candles.length).fill(null);
+        if (length < 1 || candles.length <= length * 2) return out;
+        const trs = [];
+        const plus = [];
+        const minus = [];
+        for (let i = 1; i < candles.length; i++) {
+            const bar = candles[i];
+            const prev = candles[i - 1];
+            trs.push(Math.max(bar.high - bar.low, Math.abs(bar.high - prev.close), Math.abs(bar.low - prev.close)));
+            const up = bar.high - prev.high;
+            const down = prev.low - bar.low;
+            plus.push(up > down && up > 0 ? up : 0);
+            minus.push(down > up && down > 0 ? down : 0);
+        }
+        function wilder(values) {
+            const smoothed = new Array(values.length).fill(null);
+            let total = 0;
+            for (let i = 0; i < length; i++) total += values[i];
+            smoothed[length - 1] = total;
+            for (let i = length; i < values.length; i++) {
+                total = total - total / length + values[i];
+                smoothed[i] = total;
+            }
+            return smoothed;
+        }
+        const trS = wilder(trs);
+        const plusS = wilder(plus);
+        const minusS = wilder(minus);
+        const dx = new Array(trs.length).fill(null);
+        for (let i = length - 1; i < trs.length; i++) {
+            if (!trS[i]) continue;
+            const plusDi = 100 * plusS[i] / trS[i];
+            const minusDi = 100 * minusS[i] / trS[i];
+            const denom = plusDi + minusDi;
+            dx[i] = denom === 0 ? 0 : 100 * Math.abs(plusDi - minusDi) / denom;
+        }
+        const first = 2 * length - 2;
+        const window = dx.slice(length - 1, first + 1);
+        if (window.length < length || window.some(function (value) { return value == null; })) return out;
+        let reading = window.reduce(function (sum, value) { return sum + value; }, 0) / length;
+        out[first + 1] = reading;
+        for (let i = first + 1; i < dx.length; i++) {
+            if (dx[i] == null) continue;
+            reading = (reading * (length - 1) + dx[i]) / length;
+            out[i + 1] = reading;
+        }
+        return out;
+    }
+
+    function levels(side, price, barAtr) {
+        const risk = STOP_ATR * barAtr;
+        if (side === "LONG") return { invalid: price - risk, reward2r: price + 2 * risk };
+        return { invalid: price + risk, reward2r: price - 2 * risk };
+    }
+
+    function inBand(value, band) {
+        return value >= band[0] && value <= band[1];
     }
 
     function decide(snap) {
-        const trend = regime(snap.h4Close, snap.h4EmaFast, snap.h4EmaSlow);
+        const lean = direction(snap.h4EmaFast, snap.h4EmaSlow);
+        const trend = regime(snap.h4Close, snap.h4EmaFast, snap.h4EmaSlow, snap.h1Adx);
         const base = {
             regime: trend,
             price: snap.price,
@@ -168,67 +210,52 @@
             h1EmaFast: snap.h1EmaFast,
             h1Rsi: snap.h1Rsi,
             h1Atr: snap.h1Atr,
+            h1Adx: snap.h1Adx,
             invalid: null,
             reward2r: null,
         };
+        if (snap.h1Adx == null || snap.h1Adx <= ADX_MIN) {
+            const shown = snap.h1Adx == null ? "unread" : snap.h1Adx.toFixed(1);
+            const leanText = lean === "RANGE" ? "either way" : lean.toLowerCase();
+            return Object.assign({}, base, {
+                call: "STAND ASIDE",
+                why: "1h ADX is " + shown + ", under 25. The 4h averages lean " + leanText + ", but the hour is too sideways to trade.",
+            });
+        }
         if (trend === "RANGE") {
             return Object.assign({}, base, {
                 call: "STAND ASIDE",
-                why: "4h has no trend. EMA21 and EMA55 are tangled, or price is sitting between them. Longs and shorts both get chopped up here.",
+                why: "4h EMA21 and EMA55 are tied. There is no direction to trade.",
             });
         }
         const bullish = snap.h1Close > snap.h1Open;
         const bearish = snap.h1Close < snap.h1Open;
-        const rsiUp = snap.h1Rsi > snap.h1RsiPrev;
-        const rsiDown = snap.h1Rsi < snap.h1RsiPrev;
-        const rsiMid = snap.h1Rsi >= RSI_LOW && snap.h1Rsi <= RSI_HIGH;
-        const taggedSupport = Math.min.apply(null, snap.recentLows) <= snap.h1EmaFast * (1 + EMA_TAG);
-        const taggedResistance = Math.max.apply(null, snap.recentHighs) >= snap.h1EmaFast * (1 - EMA_TAG);
-        const backAbove = snap.h1Close > snap.h1EmaFast;
-        const backBelow = snap.h1Close < snap.h1EmaFast;
-
+        const volumeOk = snap.h1VolumeAvg != null && snap.h1Volume > snap.h1VolumeAvg;
         if (trend === "LONG") {
-            if (taggedSupport && backAbove && bullish && rsiMid && rsiUp) {
-                const sketch = levels("LONG", snap.price, Math.min.apply(null, snap.recentLows), snap.h1Atr);
-                return Object.assign({}, base, sketch, {
+            const band = inBand(snap.h1Rsi, RSI_LONG);
+            if (band && bullish && volumeOk) {
+                return Object.assign({}, base, levels("LONG", snap.price, snap.h1Atr), {
                     call: "LONG",
-                    why: "4h trend is up. On the 1h, price tagged EMA21 and closed back above it on a bullish bar, with RSI turning up inside 38–62.",
+                    why: "4h EMA21 is above EMA55 and 1h ADX is " + snap.h1Adx.toFixed(1) + ". RSI reset into 40–50 and the hour closed up on above-average volume. Stop is 1.5×ATR. Size it so that distance is 1% of the account.",
                 });
             }
             let why;
-            if (snap.h1Rsi >= RSI_STRETCHED && snap.h1Close > snap.h1EmaFast) {
-                why = "4h is up, but 1h RSI is stretched. Wait for a pullback to EMA21.";
-            } else if (!backAbove && snap.h1Rsi < RSI_LOW) {
-                why = "4h is up, but the 1h pullback is deep and RSI is weak. Wait for a bullish close back above EMA21 with RSI turning up.";
-            } else if (!backAbove) {
-                why = "4h is up and price is under the 1h EMA21. Wait for a bullish close back above it.";
-            } else if (!taggedSupport) {
-                why = "4h is up, and price has not come back to the 1h EMA21 yet.";
-            } else {
-                why = "4h is up and price tagged the 1h EMA21, but " + unconfirmed(bullish, rsiMid, rsiUp, snap.h1Rsi, true);
-            }
+            if (!band) why = "4h is up and 1h ADX is " + snap.h1Adx.toFixed(1) + ". RSI is " + snap.h1Rsi.toFixed(1) + ", outside the 40–50 pullback.";
+            else if (!bullish) why = "RSI is in the 40–50 pullback, but the hour has not closed up.";
+            else why = "RSI reset into 40–50, but volume is under its 20-hour average.";
             return Object.assign({}, base, { call: "WAIT", why: why });
         }
-
-        if (taggedResistance && backBelow && bearish && rsiMid && rsiDown) {
-            const sketch = levels("SHORT", snap.price, Math.max.apply(null, snap.recentHighs), snap.h1Atr);
-            return Object.assign({}, base, sketch, {
+        const band = inBand(snap.h1Rsi, RSI_SHORT);
+        if (band && bearish && volumeOk) {
+            return Object.assign({}, base, levels("SHORT", snap.price, snap.h1Atr), {
                 call: "SHORT",
-                why: "4h trend is down. On the 1h, price tagged EMA21 and closed back below it on a bearish bar, with RSI turning down inside 38–62.",
+                why: "4h EMA21 is below EMA55 and 1h ADX is " + snap.h1Adx.toFixed(1) + ". RSI reset into 50–60 and the hour closed down on above-average volume. Stop is 1.5×ATR. Size it so that distance is 1% of the account.",
             });
         }
         let why;
-        if (snap.h1Rsi <= 100 - RSI_STRETCHED && snap.h1Close < snap.h1EmaFast) {
-            why = "4h is down, but 1h RSI is washed out. Wait for a bounce to EMA21.";
-        } else if (!backBelow && snap.h1Rsi > 100 - RSI_LOW) {
-            why = "4h is down, but the 1h bounce is strong and RSI is hot. Wait for a bearish close back under EMA21 with RSI turning down.";
-        } else if (!backBelow) {
-            why = "4h is down and price is above the 1h EMA21. Wait for a bearish close back under it.";
-        } else if (!taggedResistance) {
-            why = "4h is down, and price has not bounced to the 1h EMA21 yet.";
-        } else {
-            why = "4h is down and price tagged the 1h EMA21, but " + unconfirmed(bearish, rsiMid, rsiDown, snap.h1Rsi, false);
-        }
+        if (!band) why = "4h is down and 1h ADX is " + snap.h1Adx.toFixed(1) + ". RSI is " + snap.h1Rsi.toFixed(1) + ", outside the 50–60 bounce.";
+        else if (!bearish) why = "RSI is in the 50–60 bounce, but the hour has not closed down.";
+        else why = "RSI reset into 50–60, but volume is under its 20-hour average.";
         return Object.assign({}, base, { call: "WAIT", why: why });
     }
 
@@ -239,6 +266,8 @@
             emaSlow: ema(closes, EMA_SLOW),
             rsi: rsi(closes, RSI_PERIOD),
             atr: atr(candles, ATR_PERIOD),
+            adx: adx(candles, ADX_PERIOD),
+            volume: sma(candles.map(function (c) { return c.volume || 0; }), VOL_PERIOD),
         };
     }
 
@@ -267,13 +296,16 @@
             h1Rsi: h1x.rsi[i],
             h1RsiPrev: h1x.rsi[i - 1],
             h1Atr: h1x.atr[i],
+            h1Adx: h1x.adx[i],
+            h1Volume: bar.volume || 0,
+            h1VolumeAvg: h1x.volume[i],
             recentLows: window.map(function (c) { return c.low; }),
             recentHighs: window.map(function (c) { return c.high; }),
         };
     }
 
     function usable(snap) {
-        return [snap.h4EmaFast, snap.h4EmaSlow, snap.h1EmaFast, snap.h1Rsi, snap.h1RsiPrev, snap.h1Atr]
+        return [snap.h4EmaFast, snap.h4EmaSlow, snap.h1EmaFast, snap.h1Rsi, snap.h1RsiPrev, snap.h1Atr, snap.h1Adx]
             .every(function (v) { return v != null; });
     }
 
@@ -324,6 +356,7 @@
                 high: Number(row[2]),
                 low: Number(row[3]),
                 close: Number(row[4]),
+                volume: Number(row[6]),
             };
         });
     }
@@ -391,6 +424,7 @@
             { kind: "fact", label: "1h EMA21", text: money(call.h1EmaFast) },
             { kind: "fact", label: "21-day", text: live.dayFast || "…", line: "day21" },
             { kind: "fact", label: "200-day", text: live.daySlow || "…", line: "day200" },
+            { kind: "fact", label: "1h ADX", text: call.h1Adx == null ? "…" : call.h1Adx.toFixed(1) },
             { kind: "fact", label: "1h RSI", text: call.h1Rsi.toFixed(1) },
             { kind: "fact", label: "1h ATR", text: money(call.h1Atr) },
         ];
@@ -400,7 +434,7 @@
         }
         items.push({
             kind: "why",
-            text: "Yellow is the 1-hour EMA21. Blue is the 21-day. White is the 200-day. Nothing on this page sends an order.",
+            text: "Arrows need 1h ADX above 25, an RSI reset, and volume above its 20-hour average. Nothing on this page sends an order.",
         });
         return items;
     }
@@ -644,6 +678,8 @@
         evaluate: evaluate,
         markers: markers,
         splitLive: splitLive,
+        adx: adx,
+        regime: regime,
         bannerItems: bannerItems,
         explainFetchError: explainFetchError,
         nextDelay: nextDelay,

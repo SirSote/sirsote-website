@@ -14,6 +14,9 @@ function snap(overrides) {
         h1Rsi: 50,
         h1RsiPrev: 46,
         h1Atr: 2,
+        h1Adx: 32,
+        h1Volume: 2,
+        h1VolumeAvg: 1,
         recentLows: [99.5, 99.8, 100.2],
         recentHighs: [101, 101.5, 102],
     }, overrides);
@@ -21,11 +24,12 @@ function snap(overrides) {
 
 const long = desk.decide(snap());
 assert.strictEqual(long.call, "LONG");
-assert.ok(long.invalid < 100);
-assert.ok(long.reward2r > 100);
+assert.strictEqual(long.invalid, 97);
+assert.strictEqual(long.reward2r, 106);
 
-const range = desk.decide(snap({ h4Close: 100, h4EmaFast: 100.05, h4EmaSlow: 100 }));
+const range = desk.decide(snap({ h1Adx: 18 }));
 assert.strictEqual(range.call, "STAND ASIDE");
+assert.strictEqual(range.regime, "RANGE");
 assert.strictEqual(range.invalid, null);
 
 const stretched = desk.decide(snap({
@@ -38,7 +42,7 @@ const stretched = desk.decide(snap({
     recentLows: [109, 110, 111],
 }));
 assert.strictEqual(stretched.call, "WAIT");
-assert.ok(stretched.why.includes("stretched"));
+assert.ok(stretched.why.includes("40–50"));
 
 const short = desk.decide(snap({
     price: 100,
@@ -48,17 +52,18 @@ const short = desk.decide(snap({
     h1Open: 101,
     h1Close: 99,
     h1EmaFast: 100,
-    h1Rsi: 48,
-    h1RsiPrev: 54,
+    h1Rsi: 55,
+    h1RsiPrev: 58,
     recentLows: [98, 98.5, 99],
     recentHighs: [100.2, 100.5, 101],
 }));
 assert.strictEqual(short.call, "SHORT");
-assert.ok(short.invalid > 100);
+assert.strictEqual(short.invalid, 103);
 
 const flat = desk.ema(Array(30).fill(40), 10);
 assert.strictEqual(flat[flat.length - 1], 40);
-assert.strictEqual(desk.regime(110, 105, 100), "LONG");
+assert.strictEqual(desk.regime(110, 105, 100, 30), "LONG");
+assert.strictEqual(desk.regime(110, 105, 100, 18), "RANGE");
 assert.strictEqual(desk.regime(100.2, 100.1, 100), "RANGE");
 
 const rows = [[1, "1", "2", "0.5", "1.5"], [2, "1.5", "2", "1", "1.8"]];
