@@ -99,4 +99,12 @@ assert.ok(items.some(function (item) { return item.label === "4h trend" && item.
 assert.ok(items.some(function (item) { return item.label === "21-day" && item.line === "day21"; }));
 assert.ok(items.some(function (item) { return item.label === "Invalid"; }));
 
+assert.strictEqual(desk.explainFetchError({ message: "Failed to fetch" }), "Kraken is busy. The chart will try again.");
+assert.strictEqual(desk.explainFetchError({ message: "EGeneral:Too many requests" }), "Kraken is busy. The chart will try again.");
+assert.strictEqual(desk.explainFetchError({ message: "not enough closed candles" }), "not enough closed candles");
+assert.strictEqual(desk.nextDelay(0), 60000);
+assert.strictEqual(desk.nextDelay(1), 10000);
+assert.strictEqual(desk.nextDelay(3), 40000);
+assert.ok(desk.nextDelay(8) <= 120000);
+
 console.log("desk rules ok");

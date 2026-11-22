@@ -328,8 +328,25 @@
         });
     }
 
+    function explainFetchError(error) {
+        const message = (error && error.message) || "The desk could not read Kraken.";
+        if (message === "Failed to fetch" || /too many requests/i.test(message) || /NetworkError/i.test(message)) {
+            return "Kraken is busy. The chart will try again.";
+        }
+        return message;
+    }
+
+    function nextDelay(failures) {
+        if (!failures) return 60000;
+        return Math.min(120000, 10000 * Math.pow(2, Math.min(failures, 4) - 1));
+    }
+
+    function pause(ms) {
+        return new Promise(function (resolve) { setTimeout(resolve, ms); });
+    }
+
     async function fetchOhlc(interval) {
-        const response = await fetch("https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=" + interval);
+        const response = await fetch("https://api.kraken.com/0/public/OHLC?pair=XBTUSD&interval=" + interval, { cache: "no-store" });
         if (!response.ok) throw new Error("Kraken OHLC " + response.status);
         const payload = await response.json();
         if (payload.error && payload.error.length) throw new Error(payload.error.join(", "));
@@ -539,13 +556,21 @@
         }
 
         async function refreshCandles() {
-            const [h1, h4, days] = await Promise.all([fetchOhlc(60), fetchOhlc(240), fetchOhlc(1440)]);
+            const h1 = await fetchOhlc(60);
             const hour = splitLive(h1);
-            const four = splitLive(h4);
             view.h1 = hour.closed;
             view.forming = hour.live;
+            drawCandles();
+            await pause(400);
+            const h4 = await fetchOhlc(240);
+            const four = splitLive(h4);
             view.h4 = four.closed;
-            view.days = splitLive(days).closed;
+            await pause(400);
+            try {
+                view.days = splitLive(await fetchOhlc(1440)).closed;
+            } catch (error) {
+                view.days = view.days || [];
+            }
             view.call = evaluate(hour.closed, four.closed);
             view.marks = markers(hour.closed, four.closed);
             statusEl.textContent = "live";
@@ -563,21 +588,49 @@
             drawLive();
         }
 
+        let busy = false;
+        let failures = 0;
+        let candleTimer = 0;
+
         async function tick(kind) {
+            if (busy) return;
+            busy = true;
             try {
                 if (kind === "candles") await refreshCandles();
                 else await refreshTicker();
+                failures = 0;
             } catch (error) {
-                statusEl.textContent = "reconnect";
+                failures += 1;
                 statusEl.dataset.state = "down";
-                renderTicker([{ kind: "why", text: error.message }]);
+                statusEl.textContent = "retry";
+                if (!view.h1.length) {
+                    renderTicker([{ kind: "why", text: explainFetchError(error) }]);
+                }
+            } finally {
+                busy = false;
             }
         }
 
-        tick("candles");
-        tick("ticker");
-        setInterval(function () { tick("candles"); }, 15000);
-        setInterval(function () { tick("ticker"); }, 5000);
+        function scheduleCandles(delay) {
+            clearTimeout(candleTimer);
+            candleTimer = setTimeout(function () {
+                tick("candles").then(function () {
+                    scheduleCandles(nextDelay(failures));
+                });
+            }, delay);
+        }
+
+        statusEl.style.cursor = "pointer";
+        statusEl.title = "Read Kraken again";
+        statusEl.addEventListener("click", function () {
+            failures = 0;
+            scheduleCandles(0);
+        });
+
+        scheduleCandles(0);
+        setInterval(function () {
+            if (view.h1.length) tick("ticker");
+        }, 20000);
     }
 
     return {
@@ -592,6 +645,8 @@
         markers: markers,
         splitLive: splitLive,
         bannerItems: bannerItems,
+        explainFetchError: explainFetchError,
+        nextDelay: nextDelay,
         fetchOhlc: fetchOhlc,
         mount: mount,
     };
