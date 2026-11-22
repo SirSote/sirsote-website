@@ -160,9 +160,10 @@ main {
 .swatch.sell { background: #ff3366; border-radius: 50%; }
 .gains {
     display: flex;
+    flex: 1 1 100%;
     flex-wrap: wrap;
     gap: 0.25rem 0.9rem;
-    margin: 0 0 0 auto;
+    margin: 0;
 }
 .gains div { display: flex; gap: 0.35rem; align-items: baseline; }
 .gains dt {
@@ -176,6 +177,7 @@ main {
     margin: 0;
     font-family: "JetBrains Mono", monospace;
     font-size: 0.78rem;
+    white-space: normal;
 }
 .gains dd[data-sign="up"] { color: var(--long); }
 .gains dd[data-sign="down"] { color: var(--short); }

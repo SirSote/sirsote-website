@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="liquidity.css?v=20261121b">
+    <link rel="stylesheet" href="liquidity.css?v=20261121d">
     <link rel="stylesheet" href="/site-nav.css">
     <link rel="stylesheet" href="/site-finish.css">
 </head>
@@ -44,29 +44,33 @@
                 <span class="book-name">btc / usd</span>
                 <span id="book-status" class="feed" data-state="load">connecting</span>
                 <span class="legend"><i class="swatch heat"></i>size<i class="swatch buy"></i>buys<i class="swatch sell"></i>sells</span>
-                <div class="ranges" role="group" aria-label="Price window in dollars">
+                <div class="ranges" id="price-ranges" role="group" aria-label="Price window in dollars">
                     <button type="button" data-mode="tight">±30</button>
                     <button type="button" data-mode="near" aria-pressed="true">±100</button>
                     <button type="button" data-mode="wide">±250</button>
                     <button type="button" data-mode="far">±500</button>
                 </div>
+                <div class="ranges" id="time-ranges" role="group" aria-label="Time window">
+                    <button type="button" data-span="10" aria-pressed="true">10m</button>
+                    <button type="button" data-span="30">30m</button>
+                </div>
                 <dl class="gains">
                     <div><dt>Today</dt><dd id="gain-day">…</dd></div>
                     <div><dt>Since load</dt><dd id="gain-load">…</dd></div>
                     <div><dt>10m delta</dt><dd id="gain-delta">…</dd></div>
-                    <div><dt>Book</dt><dd id="gain-book">…</dd></div>
+                    <div><dt id="book-label">Book ±100</dt><dd id="gain-book">…</dd></div>
                     <div><dt>Spread</dt><dd id="gain-spread">…</dd></div>
-                    <div><dt>Bid wall</dt><dd id="wall-bid">…</dd></div>
-                    <div><dt>Ask wall</dt><dd id="wall-ask">…</dd></div>
+                    <div><dt id="wall-bid-label">Bid top</dt><dd id="wall-bid">…</dd></div>
+                    <div><dt id="wall-ask-label">Ask top</dt><dd id="wall-ask">…</dd></div>
                 </dl>
             </div>
             <canvas id="book-canvas" aria-hidden="true"></canvas>
             <p id="book-hover" class="book-hover">Hover the book. Brighter bands are more coin resting. Dots are trades.</p>
         </section>
     </main>
-    <script src="/p/btc-desk/desk.js?v=20261121b"></script>
-    <script src="book.js?v=20261121b"></script>
-    <script src="signal.js?v=20261121b"></script>
+    <script src="/p/btc-desk/desk.js?v=20261121c"></script>
+    <script src="book.js?v=20261121c"></script>
+    <script src="signal.js?v=20261121c"></script>
     <script src="/site-matrix.js"></script>
 </body>
 </html>

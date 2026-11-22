@@ -177,4 +177,144 @@ assert.ok(bookOnly.text.includes("short-term"));
 
 assert.strictEqual(book.priceStep(700), 100);
 
+assert.strictEqual(book.bannerReady(null), false);
+assert.strictEqual(book.bannerReady({}), false);
+assert.strictEqual(book.bannerReady({ call: "WAIT" }), true);
+const keptCall = book.afterCandleFailure({ call: "WAIT", why: "still the last hour" });
+assert.strictEqual(keptCall.call.call, "WAIT");
+assert.ok(keptCall.stall.includes("last call is still up"));
+const missed = book.afterCandleFailure(null);
+assert.strictEqual(missed.call, null);
+assert.ok(missed.stall.includes("Waiting for a fresh read"));
+
+function sheetLine(text) {
+    const low = text.toLowerCase();
+    if (low.includes("book agrees")) return "agrees";
+    if (low.includes("book is leaning") && low.includes("not confirmed")) return "fights";
+    return null;
+}
+assert.strictEqual(sheetLine(agreed.text), "agrees");
+assert.strictEqual(sheetLine(fight.text), "fights");
+assert.strictEqual(sheetLine(quiet.text), null);
+const tapeLean = book.prejudge(
+    { call: "SHORT", regime: "SHORT", why: "4h is down" },
+    { share: 0.5, deltaQty: -3 },
+);
+assert.strictEqual(tapeLean.from, "tape");
+assert.strictEqual(tapeLean.book, "down");
+assert.strictEqual(tapeLean.path, "down");
+assert.ok(tapeLean.text.includes("The lean is from the tape."));
+assert.strictEqual(sheetLine(tapeLean.text), "agrees");
+const tapeFight = book.prejudge({ call: "SHORT", regime: "SHORT" }, { share: 0.5, deltaQty: 3 });
+assert.strictEqual(tapeFight.from, "tape");
+assert.strictEqual(sheetLine(tapeFight.text), "fights");
+
+const ordinary = book.wallPick([
+    { price: 100, qty: 15 },
+    { price: 101, qty: 5 },
+    { price: 102, qty: 5.8 },
+    { price: 103, qty: 5.8 },
+    { price: 104, qty: 5.8 },
+]);
+assert.strictEqual(ordinary.wall, false);
+const realWall = book.wallPick([
+    { price: 100, qty: 40 },
+    { price: 101, qty: 5 },
+    { price: 102, qty: 5 },
+    { price: 103, qty: 6 },
+    { price: 104, qty: 5 },
+]);
+assert.strictEqual(realWall.wall, true);
+assert.strictEqual(realWall.price, 100);
+const outsideBook = new Map([[100, 5], [101, 5], [102, 6], [103, 5], [90, 40]]);
+const outsideRead = book.wallRead(outsideBook, 99, 110, 105, "Bid");
+assert.ok(outsideRead.text.includes("outside"));
+assert.strictEqual(outsideRead.pick.wall, false);
+
+const widePlan = book.timeTickPlan(800, 1, 10 * 60 * 1000);
+assert.strictEqual(widePlan.count, 3);
+assert.strictEqual(widePlan.seconds, false);
+assert.strictEqual(book.timeTickPlan(300, 1, 10 * 60 * 1000).count, 2);
+assert.strictEqual(book.timeTickPlan(800, 1, 20000).seconds, true);
+
+const sameSecond = { trades: [], seen: new Set() };
+const firstPrint = { side: "buy", price: 100, qty: 0.5, t: 5000, id: 11 };
+const secondPrint = { side: "buy", price: 100, qty: 0.5, t: 5000, id: 12 };
+assert.strictEqual(book.rememberTrades(sameSecond, [firstPrint, secondPrint]).length, 2);
+assert.strictEqual(book.deltaInWindow(sameSecond.trades, 0, 9000).qty, 1);
+
+const seeded = book.mergeCandle([], { time: 10, open: 1, high: 2, low: 1, close: 1.5 });
+const replaced = book.mergeCandle(seeded, { time: 10, open: 1, high: 4, low: 1, close: 3 });
+assert.strictEqual(replaced.length, 1);
+assert.strictEqual(replaced[0].close, 3);
+const longer = book.mergeCandle(replaced, { time: 5, open: 1, high: 1, low: 1, close: 1 });
+assert.strictEqual(longer[0].time, 5);
+assert.strictEqual(book.enoughCandles(longer, longer), false);
+const phoenixNoon = Date.UTC(2026, 10, 21, 20, 0, 0);
+const phoenixOpen = book.phoenixMidnightMs(phoenixNoon);
+assert.strictEqual(phoenixOpen, Date.UTC(2026, 10, 21, 7, 0, 0));
+assert.strictEqual(book.sessionOpen([{ time: phoenixOpen / 1000, open: 60000 }], phoenixNoon), 60000);
+const wireCandle = book.candleFromOhlc({
+    interval: "60",
+    interval_begin: "2026-11-21T16:00:00.000000000Z",
+    open: "100",
+    high: "110",
+    low: "90",
+    close: "105",
+});
+assert.strictEqual(wireCandle.time, 1795276800);
+assert.strictEqual(wireCandle.close, 105);
+
+const flashed = book.createState();
+book.applySnapshot(flashed.book, [[100, 1], [99, 1]], [[101, 1]]);
+book.sampleBook(flashed, 1000);
+book.rememberSize(flashed, 100, 9, "bid");
+book.applyUpdate(flashed.book, [[100, 0]], []);
+const flashedColumn = book.sampleBook(flashed, 2000);
+const flashedRow = Math.floor((100 - flashed.grid.low) / flashed.grid.bin);
+assert.ok(flashedColumn.bids[flashedRow] >= 9);
+const packed = book.packHistory(flashed.columns, flashed.grid, 10);
+const unpacked = book.unpackHistory(packed, flashed.grid);
+assert.strictEqual(unpacked.length, flashed.columns.length);
+assert.ok(unpacked[1].bids[flashedRow] >= 9);
+
+const docAsks = [
+    { price: "45285.2", qty: "0.00100000" },
+    { price: "45286.4", qty: "1.54571953" },
+    { price: "45286.6", qty: "1.54571109" },
+    { price: "45289.6", qty: "1.54560911" },
+    { price: "45290.2", qty: "0.15890660" },
+    { price: "45291.8", qty: "1.54553491" },
+    { price: "45294.7", qty: "0.04454749" },
+    { price: "45296.1", qty: "0.35380000" },
+    { price: "45297.5", qty: "0.09945542" },
+    { price: "45299.5", qty: "0.18772827" },
+];
+const docBids = [
+    { price: "45283.5", qty: "0.10000000" },
+    { price: "45283.4", qty: "1.54582015" },
+    { price: "45282.1", qty: "0.10000000" },
+    { price: "45281.0", qty: "0.10000000" },
+    { price: "45280.3", qty: "1.54592586" },
+    { price: "45279.0", qty: "0.07990000" },
+    { price: "45277.6", qty: "0.03310103" },
+    { price: "45277.5", qty: "0.30000000" },
+    { price: "45277.3", qty: "1.54602737" },
+    { price: "45276.6", qty: "0.15445238" },
+];
+const wired = book.createBook(10);
+const snap = book.applyWireBook(wired, "snapshot", { bids: docBids, asks: docAsks, checksum: 3310070434 });
+assert.strictEqual(snap.ok, true);
+assert.strictEqual(snap.resubscribe, false);
+assert.strictEqual(book.bestBid(wired), 45283.5);
+const keptQty = wired.wireBids["45283.5"];
+const bad = book.applyWireBook(wired, "update", {
+    bids: [{ price: "45283.5", qty: "9.00000000" }],
+    asks: [],
+    checksum: 1,
+});
+assert.strictEqual(bad.ok, false);
+assert.strictEqual(bad.resubscribe, true);
+assert.strictEqual(wired.wireBids["45283.5"], keptQty);
+
 console.log("book liquidity ok");

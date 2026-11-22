@@ -14,23 +14,49 @@
     const BOOK_DEPTH = 1000;
     const REST_DEPTH = 500;
     const WINDOW_MS = 10 * 60 * 1000;
+    const KEEP_MS = 30 * 60 * 1000;
     const SAMPLE_MS = 500;
+    const TAPE_QTY = 2;
     const BIN = 1;
     const STORE_HALF = 800;
     const PRICE_WINDOW = { tight: 60, near: 200, wide: 500, far: 1000 };
     const TZ = "America/Phoenix";
     const PAIR = "BTC/USD";
     let latestCall = null;
+    let latestStall = "";
     const callListeners = [];
+    const ohlcListeners = [];
+
+    function emitCall() {
+        for (let i = 0; i < callListeners.length; i++) callListeners[i](latestCall, latestStall);
+    }
 
     function publishCall(call) {
         latestCall = call;
-        for (let i = 0; i < callListeners.length; i++) callListeners[i](call);
+        latestStall = "";
+        emitCall();
+    }
+
+    function publishStall(message) {
+        latestStall = message || stallNote(!!(latestCall && latestCall.call));
+        emitCall();
+    }
+
+    function currentCall() {
+        return latestCall;
     }
 
     function onCall(fn) {
         callListeners.push(fn);
-        if (latestCall) fn(latestCall);
+        if (latestCall || latestStall) fn(latestCall, latestStall);
+    }
+
+    function onOhlc(fn) {
+        ohlcListeners.push(fn);
+    }
+
+    function emitOhlc(row) {
+        for (let i = 0; i < ohlcListeners.length; i++) ohlcListeners[i](row);
     }
 
     function deskLean(call) {
@@ -42,8 +68,18 @@
         return "flat";
     }
 
-    function bookLean(share, deltaQty) {
+    function bookSource(share, deltaQty) {
         if (share == null || !Number.isFinite(share) || !Number.isFinite(deltaQty)) return "flat";
+        if (share >= 0.55 && deltaQty >= 0) return "book";
+        if (share <= 0.45 && deltaQty <= 0) return "book";
+        if (Math.abs(deltaQty) >= TAPE_QTY && share > 0.45 && share < 0.55) return "tape";
+        return "flat";
+    }
+
+    function bookLean(share, deltaQty) {
+        const source = bookSource(share, deltaQty);
+        if (source === "flat") return "flat";
+        if (source === "tape") return deltaQty > 0 ? "up" : "down";
         if (share >= 0.55 && deltaQty >= 0) return "up";
         if (share <= 0.45 && deltaQty <= 0) return "down";
         return "flat";
@@ -62,6 +98,7 @@
         const tape = book || {};
         const desk = deskLean(call);
         const side = bookLean(tape.share, tape.deltaQty);
+        const from = bookSource(tape.share, tape.deltaQty);
         const phrase = deskPhrase(call);
         let path = "flat";
         let text;
@@ -87,7 +124,8 @@
         if (path === "up" && tape.askWall) {
             text += " An ask wall at " + formatPrice(tape.askWall.price) + " can stall the rise.";
         }
-        return { desk: desk, book: side, path: path, text: text };
+        if (from === "tape") text += " The lean is from the tape.";
+        return { desk: desk, book: side, path: path, from: from, text: text };
     }
 
     function lerp(a, b, t) {
@@ -95,7 +133,13 @@
     }
 
     function createBook(depth) {
-        return { bids: new Map(), asks: new Map(), depth: depth || BOOK_DEPTH };
+        return {
+            bids: new Map(),
+            asks: new Map(),
+            depth: depth || BOOK_DEPTH,
+            wireBids: {},
+            wireAsks: {},
+        };
     }
 
     function createTape() {
@@ -110,6 +154,12 @@
             grid: null,
             view: null,
             mode: "near",
+            spanMs: WINDOW_MS,
+            stall: "",
+            daySource: null,
+            peak: null,
+            restored: null,
+            historyApplied: false,
             anchor: null,
             open: null,
             last: null,
@@ -248,11 +298,28 @@
         state.mid = span.mid;
         if (state.anchor == null) state.anchor = span.mid;
         state.view = holdView(state.view, span.mid, state.mode);
+        const prevLow = state.grid ? state.grid.low : null;
+        const prevRows = state.grid ? state.grid.rows : null;
         state.grid = settleGrid(state.grid, state.columns, state.view);
+        if (state.peak && prevLow != null && (prevLow !== state.grid.low || prevRows !== state.grid.rows)) {
+            const shift = Math.round((prevLow - state.grid.low) / BIN);
+            state.peak.bids = shiftArrays(state.peak.bids, state.grid.rows, shift);
+            state.peak.asks = shiftArrays(state.peak.asks, state.grid.rows, shift);
+        }
+        raisePeak(state);
         const mark = state.last == null ? span.mid : state.last;
-        const column = sampleColumn(state.book, state.grid, now, mark);
+        const column = sampleFromPeak(state, now, mark);
+        if (state.restored && !state.historyApplied) {
+            const older = unpackHistory(state.restored, state.grid).filter(function (col) {
+                return col.t < column.t && col.t >= now - KEEP_MS;
+            });
+            state.columns = older.concat(state.columns);
+            state.historyApplied = true;
+            state.restored = null;
+        }
         state.columns.push(column);
-        const cutoff = now - WINDOW_MS;
+        decayPeak(state);
+        const cutoff = now - KEEP_MS;
         while (state.columns.length && state.columns[0].t < cutoff) state.columns.shift();
         return column;
     }
@@ -287,11 +354,12 @@
         return ans;
     }
 
-    function timeWindow(columns, now) {
+    function timeWindow(columns, now, spanMs) {
         const minSpan = 15000;
+        const want = spanMs || WINDOW_MS;
         if (!columns.length) return { t0: now - minSpan, t1: now };
         const recorded = Math.max(0, now - columns[0].t);
-        const span = Math.min(WINDOW_MS, Math.max(minSpan, recorded));
+        const span = Math.min(want, Math.max(minSpan, recorded));
         return { t0: now - span, t1: now };
     }
 
@@ -402,6 +470,7 @@
     }
 
     function tradeKey(trade) {
+        if (trade.id != null && trade.id !== "") return "id|" + trade.id;
         return [
             trade.side,
             trade.price.toFixed(1),
@@ -713,16 +782,25 @@ function pruneTrades(tape, cutoff) {
         let scratch = null;
         let heatKey = "";
         let drawTimer = 0;
+        let lastWire = 0;
         const clockFormat = new Intl.DateTimeFormat("en-US", {
             timeZone: TZ,
             hour: "numeric",
             minute: "2-digit",
             second: "2-digit",
         });
+        const clockFormatMin = new Intl.DateTimeFormat("en-US", {
+            timeZone: TZ,
+            hour: "numeric",
+            minute: "2-digit",
+        });
 
         try {
             const savedMode = sessionStorage.getItem("liquidity-book-mode");
             if (savedMode === "tight" || savedMode === "near" || savedMode === "wide" || savedMode === "far") state.mode = savedMode;
+            if (sessionStorage.getItem("liquidity-book-span") === "30") state.spanMs = KEEP_MS;
+            const rawHistory = sessionStorage.getItem("liquidity-book-v1");
+            if (rawHistory) state.restored = JSON.parse(rawHistory);
         } catch (error) { /* storage off */ }
 
         function setFeed(name, text) {
@@ -749,8 +827,19 @@ function pruneTrades(tape, cutoff) {
                 const low = state.view ? state.view.low : range.low;
                 const high = state.view ? state.view.high : range.high;
                 share = bidShare(bandQty(state.book.bids, low, high), bandQty(state.book.asks, low, high));
-                bidWall = topLevel(state.book.bids, low, high);
-                askWall = topLevel(state.book.asks, low, high);
+                const bidRead = wallRead(state.book.bids, low, high, range.mid, "Bid");
+                const askRead = wallRead(state.book.asks, low, high, range.mid, "Ask");
+                bidWall = bidRead.pick && bidRead.pick.wall ? bidRead.pick : null;
+                askWall = askRead.pick && askRead.pick.wall ? askRead.pick : null;
+                const bidLabel = document.getElementById("wall-bid-label");
+                const askLabel = document.getElementById("wall-ask-label");
+                const bookLabel = document.getElementById("book-label");
+                const windowName = { tight: "±30", near: "±100", wide: "±250", far: "±500" };
+                if (bookLabel) bookLabel.textContent = "Book " + (windowName[state.mode] || "±100");
+                if (bidLabel) bidLabel.textContent = bidRead.label;
+                if (askLabel) askLabel.textContent = askRead.label;
+                if (bidWallEl) bidWallEl.textContent = bidRead.text;
+                if (askWallEl) askWallEl.textContent = askRead.text;
                 if (spreadEl) spreadEl.textContent = formatPrice(range.ask - range.bid);
             }
             setSigned(dayEl, day ? formatGain(day) : "…", day && day.usd);
@@ -761,8 +850,6 @@ function pruneTrades(tape, cutoff) {
                 bookEl.textContent = share == null ? "…" : Math.round(share * 100) + "% bid";
                 bookEl.dataset.sign = share == null ? "flat" : signOf(share - 0.5);
             }
-            if (bidWallEl) bidWallEl.textContent = bidWall ? formatPrice(bidWall.price) + " · " + formatCoin(bidWall.qty) : "—";
-            if (askWallEl) askWallEl.textContent = askWall ? formatPrice(askWall.price) + " · " + formatCoin(askWall.qty) : "—";
             paintLean(share, flow.qty, bidWall, askWall);
         }
 
@@ -777,14 +864,24 @@ function pruneTrades(tape, cutoff) {
                 bidWall: bidWall,
                 askWall: askWall,
             });
+            const ready = bannerReady(state.call);
             if (callEl) {
-                callEl.textContent = state.call ? state.call.call : "…";
-                callEl.dataset.tone = state.call ? state.call.call.toLowerCase().replace(/\s+/g, "-") : "wait";
+                callEl.textContent = ready ? state.call.call : "…";
+                callEl.dataset.tone = ready ? state.call.call.toLowerCase().replace(/\s+/g, "-") : "wait";
             }
-            textEl.textContent = read.text;
-            textEl.dataset.path = read.path;
-            textEl.dataset.ready = "yes";
-            if (whyEl) whyEl.textContent = state.call && state.call.why ? state.call.why : "";
+            if (!ready) {
+                textEl.textContent = state.stall || "The desk has not called yet.";
+                textEl.dataset.path = "flat";
+                delete textEl.dataset.ready;
+            } else {
+                textEl.textContent = read.text;
+                textEl.dataset.path = read.path;
+                textEl.dataset.ready = "yes";
+            }
+            if (whyEl) {
+                const why = ready && state.call.why ? state.call.why : "";
+                whyEl.textContent = ready && state.stall ? (why ? why + " " + state.stall : state.stall) : why;
+            }
         }
 
         function markLevel(ctx, price, color, label) {
@@ -843,7 +940,7 @@ function pruneTrades(tape, cutoff) {
             ctx.fillStyle = "#0a0a0a";
             ctx.fillRect(0, 0, width, height);
             const now = Date.now();
-            const windowSpan = timeWindow(state.columns, now);
+            const windowSpan = timeWindow(state.columns, now, state.spanMs);
             const t0 = windowSpan.t0;
             const t1 = windowSpan.t1;
             const spanMs = t1 - t0 || 1;
@@ -999,13 +1096,10 @@ function pruneTrades(tape, cutoff) {
             ctx.textBaseline = "top";
             ctx.fillText("delta", box.plotX, box.cvdY + 2);
 
-            ctx.textAlign = "center";
-            ctx.textBaseline = "top";
-            for (let i = 0; i < 4; i++) {
-                const t = t0 + (i / 3) * spanMs;
-                const x = box.plotX + (i / 3) * box.plotW;
-                ctx.fillText(clockFormat.format(t), x, box.timeY + 2);
-            }
+            const tickPlan = timeTickPlan(box.plotW, box.dpr, spanMs);
+            drawTimeAxis(ctx, box, t0, t1, function (t) {
+                return (tickPlan.seconds ? clockFormat : clockFormatMin).format(t);
+            });
 
             if (hover) {
                 const hit = hitTest(box, hover.x, hover.y, state.view, state.grid, state.columns, t0, t1);
@@ -1060,7 +1154,7 @@ function pruneTrades(tape, cutoff) {
                 scheduleDraw();
             });
         }
-        const modeButtons = document.querySelectorAll("#book .ranges button");
+        const modeButtons = document.querySelectorAll("#price-ranges button");
         for (let i = 0; i < modeButtons.length; i++) {
             modeButtons[i].setAttribute("aria-pressed", modeButtons[i].dataset.mode === state.mode ? "true" : "false");
             modeButtons[i].addEventListener("click", function () {
@@ -1073,6 +1167,21 @@ function pruneTrades(tape, cutoff) {
                     modeButtons[j].setAttribute("aria-pressed", modeButtons[j].dataset.mode === state.mode ? "true" : "false");
                 }
                 try { sessionStorage.setItem("liquidity-book-mode", state.mode); } catch (error) {}
+                heatKey = "";
+                paintStats();
+                scheduleDraw();
+            });
+        }
+        const timeButtons = document.querySelectorAll("#time-ranges button");
+        for (let i = 0; i < timeButtons.length; i++) {
+            const chosen = state.spanMs === KEEP_MS ? "30" : "10";
+            timeButtons[i].setAttribute("aria-pressed", timeButtons[i].dataset.span === chosen ? "true" : "false");
+            timeButtons[i].addEventListener("click", function () {
+                state.spanMs = timeButtons[i].dataset.span === "30" ? KEEP_MS : WINDOW_MS;
+                for (let j = 0; j < timeButtons.length; j++) {
+                    timeButtons[j].setAttribute("aria-pressed", timeButtons[j].dataset.span === timeButtons[i].dataset.span ? "true" : "false");
+                }
+                try { sessionStorage.setItem("liquidity-book-span", timeButtons[i].dataset.span); } catch (error) {}
                 heatKey = "";
                 scheduleDraw();
             });
@@ -1112,7 +1221,7 @@ function pruneTrades(tape, cutoff) {
             const payload = await pullJson("https://api.kraken.com/0/public/Ticker?pair=XBTUSD");
             const tick = parseTicker(payload);
             if (!tick) return;
-            state.open = tick.open;
+            if (state.daySource !== "phoenix") state.open = tick.open;
             if (state.last == null) state.last = tick.last;
             paintStats();
         }
@@ -1132,8 +1241,14 @@ function pruneTrades(tape, cutoff) {
         }
 
         state.call = latestCall;
-        onCall(function (call) {
+        state.stall = latestStall;
+        onCall(function (call, stall) {
             state.call = call;
+            state.stall = stall || "";
+            if (call && Number.isFinite(call.dayOpen)) {
+                state.open = call.dayOpen;
+                state.daySource = "phoenix";
+            }
             paintStats();
             scheduleDraw();
         });
@@ -1156,23 +1271,44 @@ function pruneTrades(tape, cutoff) {
                     method: "subscribe",
                     params: { channel: "trade", symbol: [PAIR], snapshot: true },
                 }));
+                ws.send(JSON.stringify({
+                    method: "subscribe",
+                    params: { channel: "ohlc", symbol: [PAIR], interval: 60, snapshot: true },
+                }));
             };
             ws.onmessage = function (event) {
                 let message;
-                try { message = JSON.parse(event.data); }
+                try { message = parseWire(event.data); }
                 catch (error) { return; }
                 if (message && (message.success === false || message.error)) {
+                    const err = String(message.error || "");
+                    if (err.indexOf("ohlc") !== -1) return;
                     if (depth > 500) depth = 500;
                     ws.close();
                     return;
                 }
-                if (ingestBook(state.book, message)) {
+                if (message && message.channel === "ohlc" && message.data) {
+                    for (let i = 0; i < message.data.length; i++) emitOhlc(message.data[i]);
+                    return;
+                }
+                if (message && message.channel === "book" && message.data && message.data.length) {
+                    const row = message.data[0];
+                    if (row.symbol && row.symbol !== PAIR) return;
+                    const applied = applyWireBook(state.book, message.type, row);
+                    if (!applied.ok) {
+                        state.book = createBook(depth);
+                        setFeed("down", "resync");
+                        ws.close();
+                        return;
+                    }
+                    lastWire = Date.now();
+                    raisePeak(state);
                     if (message.type === "snapshot") {
                         source = "ws";
                         stopRest();
                         sampleBook(state, Date.now());
-                        setFeed("live", "book live");
                     }
+                    if (feedEl.dataset.state !== "live") setFeed("live", "book live");
                     paintStats();
                     scheduleDraw();
                     return;
@@ -1189,6 +1325,7 @@ function pruneTrades(tape, cutoff) {
             ws.onclose = function () {
                 clearInterval(ping);
                 if (socket === ws) socket = null;
+                lastWire = 0;
                 if (stopped) return;
                 if (source === "ws") source = "none";
                 setFeed("down", "reconnecting");
@@ -1206,10 +1343,18 @@ function pruneTrades(tape, cutoff) {
         setTimeout(function () { pullTicker().catch(fail); }, 1200);
         setInterval(function () { pullTicker().catch(fail); }, 20000);
         setInterval(function () {
-            sampleBook(state, Date.now());
-            pruneTrades(state.tape, Date.now() - WINDOW_MS);
+            const now = Date.now();
+            sampleBook(state, now);
+            pruneTrades(state.tape, now - KEEP_MS);
+            if (source === "ws" && lastWire && now - lastWire > 5000 && document.visibilityState !== "hidden") {
+                setFeed("down", "book stalled");
+            }
             paintStats();
             scheduleDraw();
+            if (!state.savedAt || now - state.savedAt > 5000) {
+                saveHistory(state);
+                state.savedAt = now;
+            }
         }, SAMPLE_MS);
         if (typeof ResizeObserver !== "undefined") {
             const observer = new ResizeObserver(function () {
@@ -1219,6 +1364,388 @@ function pruneTrades(tape, cutoff) {
             observer.observe(canvas);
         }
         if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleDraw);
+    }
+
+    function stallNote(hasCall) {
+        if (hasCall) return "Candles stalled. The last call is still up.";
+        return "Candles stalled. Waiting for a fresh read.";
+    }
+
+    function bannerReady(call) {
+        return !!(call && call.call);
+    }
+
+    function afterCandleFailure(previous) {
+        const call = previous && previous.call ? previous : null;
+        return { call: call, stall: stallNote(!!call) };
+    }
+
+    function phoenixMidnightMs(now) {
+        const parts = new Intl.DateTimeFormat("en-US", {
+            timeZone: TZ,
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        }).formatToParts(new Date(now));
+        function pick(type) {
+            for (let i = 0; i < parts.length; i++) {
+                if (parts[i].type === type) return Number(parts[i].value);
+            }
+            return NaN;
+        }
+        return Date.UTC(pick("year"), pick("month") - 1, pick("day"), 7, 0, 0);
+    }
+
+    function sessionOpen(candles, now) {
+        if (!candles || !candles.length) return null;
+        const start = Math.floor(phoenixMidnightMs(now) / 1000);
+        for (let i = 0; i < candles.length; i++) {
+            if (candles[i].time === start) return candles[i].open;
+        }
+        return null;
+    }
+
+    function candleFromOhlc(row) {
+        if (!row) return null;
+        const begin = row.interval_begin || row.timestamp;
+        if (!begin) return null;
+        const ms = Date.parse(String(begin).replace(/(\.\d{3})\d+/, "$1"));
+        const open = Number(row.open);
+        const high = Number(row.high);
+        const low = Number(row.low);
+        const close = Number(row.close);
+        if (!Number.isFinite(ms) || ![open, high, low, close].every(Number.isFinite)) return null;
+        return { time: Math.floor(ms / 1000), open: open, high: high, low: low, close: close };
+    }
+
+    function mergeCandle(series, candle) {
+        const next = (series || []).slice();
+        if (!candle) return next;
+        for (let i = 0; i < next.length; i++) {
+            if (next[i].time === candle.time) {
+                next[i] = candle;
+                return next;
+            }
+        }
+        next.push(candle);
+        next.sort(function (a, b) { return a.time - b.time; });
+        return next;
+    }
+
+    function enoughCandles(h1, h4) {
+        return !!(h1 && h4 && h1.length >= 70 && h4.length >= 58);
+    }
+
+    function timeTickPlan(plotW, dpr, spanMs) {
+        const scale = dpr || 1;
+        return {
+            count: plotW < 420 * scale ? 2 : 3,
+            seconds: spanMs < 60000,
+        };
+    }
+
+    function drawTimeAxis(ctx, box, t0, t1, format) {
+        const plan = timeTickPlan(box.plotW, box.dpr, t1 - t0);
+        const stamps = plan.count === 2 ? [t0, t1] : [t0, (t0 + t1) / 2, t1];
+        const labels = stamps.map(function (t) { return format(t); });
+        const widths = labels.map(function (label) { return ctx.measureText(label).width; });
+        const gap = 8 * box.dpr;
+        const y = box.timeY + 2;
+        ctx.fillStyle = "#8d8d8d";
+        ctx.textBaseline = "top";
+        ctx.textAlign = "left";
+        ctx.fillText(labels[0], box.plotX, y);
+        ctx.textAlign = "right";
+        ctx.fillText(labels[labels.length - 1], box.plotRight, y);
+        if (labels.length === 3) {
+            const midX = box.plotX + box.plotW / 2;
+            const leftEnd = box.plotX + widths[0] + gap;
+            const rightStart = box.plotRight - widths[2] - gap;
+            if (midX - widths[1] / 2 >= leftEnd && midX + widths[1] / 2 <= rightStart) {
+                ctx.textAlign = "center";
+                ctx.fillText(labels[1], midX, y);
+            }
+        }
+    }
+
+    function medianQty(values) {
+        if (!values.length) return 0;
+        const copy = values.slice().sort(function (a, b) { return a - b; });
+        const mid = Math.floor(copy.length / 2);
+        if (copy.length % 2) return copy[mid];
+        return (copy[mid - 1] + copy[mid]) / 2;
+    }
+
+    function wallPick(levels) {
+        if (!levels || !levels.length) return null;
+        const sorted = levels.slice().sort(function (a, b) { return b.qty - a.qty; });
+        const top = sorted[0];
+        const med = medianQty(levels.map(function (level) { return level.qty; }));
+        const next = sorted.length > 1 ? sorted[1].qty : 0;
+        const wall = med > 0 && top.qty >= med * 4 && top.qty >= next * 2;
+        return { price: top.price, qty: top.qty, wall: wall };
+    }
+
+    function levelsFrom(map, low, high, inside) {
+        const out = [];
+        for (const [price, qty] of map) {
+            const inBand = price >= low && price <= high;
+            if (inside === inBand) out.push({ price: price, qty: qty });
+        }
+        return out;
+    }
+
+    function formatDistance(price, mid) {
+        const dist = price - mid;
+        const away = Math.abs(dist);
+        if (away < 0.05) return "at the price";
+        const digits = away >= 100 ? 0 : away >= 10 ? 1 : 2;
+        return formatPrice(away, digits) + (dist > 0 ? " above" : " below");
+    }
+
+    function wallRead(map, low, high, mid, name) {
+        const inside = wallPick(levelsFrom(map, low, high, true));
+        const outside = wallPick(levelsFrom(map, low, high, false));
+        if (!inside) return { label: name + " top", text: "—", pick: null };
+        let text = formatPrice(inside.price) + " · " + formatCoin(inside.qty) + " · " + formatDistance(inside.price, mid);
+        if (outside && outside.qty > inside.qty) text += " · larger " + formatPrice(outside.price) + " outside";
+        return { label: inside.wall ? name + " wall" : name + " top", text: text, pick: inside };
+    }
+
+    function alignPeak(state) {
+        if (!state.grid) return;
+        if (!state.peak || state.peak.bids.length !== state.grid.rows) {
+            state.peak = {
+                bids: new Float32Array(state.grid.rows),
+                asks: new Float32Array(state.grid.rows),
+            };
+        }
+    }
+
+    function paintSum(map, dest, grid) {
+        for (const [price, qty] of map) {
+            const i = Math.floor((price - grid.low) / grid.bin);
+            if (i < 0 || i >= dest.length) continue;
+            dest[i] += qty;
+        }
+    }
+
+    function raisePeak(state) {
+        alignPeak(state);
+        if (!state.peak) return;
+        const bids = new Float32Array(state.grid.rows);
+        const asks = new Float32Array(state.grid.rows);
+        paintSum(state.book.bids, bids, state.grid);
+        paintSum(state.book.asks, asks, state.grid);
+        for (let i = 0; i < bids.length; i++) {
+            if (bids[i] > state.peak.bids[i]) state.peak.bids[i] = bids[i];
+            if (asks[i] > state.peak.asks[i]) state.peak.asks[i] = asks[i];
+        }
+    }
+
+    function decayPeak(state) {
+        if (!state.peak || !state.grid) return;
+        const bids = new Float32Array(state.grid.rows);
+        const asks = new Float32Array(state.grid.rows);
+        paintSum(state.book.bids, bids, state.grid);
+        paintSum(state.book.asks, asks, state.grid);
+        for (let i = 0; i < state.peak.bids.length; i++) {
+            const faded = state.peak.bids[i] * 0.65;
+            state.peak.bids[i] = bids[i] > faded ? bids[i] : faded;
+            if (state.peak.bids[i] < 0.0001) state.peak.bids[i] = 0;
+            const fadedAsk = state.peak.asks[i] * 0.65;
+            state.peak.asks[i] = asks[i] > fadedAsk ? asks[i] : fadedAsk;
+            if (state.peak.asks[i] < 0.0001) state.peak.asks[i] = 0;
+        }
+    }
+
+    function sampleFromPeak(state, now, last) {
+        alignPeak(state);
+        return {
+            t: now,
+            bids: new Float32Array(state.peak.bids),
+            asks: new Float32Array(state.peak.asks),
+            bestBid: bestBid(state.book),
+            bestAsk: bestAsk(state.book),
+            last: last,
+        };
+    }
+
+    function rememberSize(state, price, qty, side) {
+        if (!state.grid) return;
+        alignPeak(state);
+        const i = Math.floor((price - state.grid.low) / state.grid.bin);
+        const dest = side === "ask" ? state.peak.asks : state.peak.bids;
+        if (i < 0 || i >= dest.length) return;
+        if (qty > dest[i]) dest[i] = qty;
+    }
+
+    function packSide(arr, grid) {
+        const levels = [];
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] >= 0.05) levels.push([grid.low + i * grid.bin, Math.round(arr[i] * 1000) / 1000]);
+        }
+        levels.sort(function (a, b) { return b[1] - a[1]; });
+        return levels.slice(0, 40);
+    }
+
+    function packHistory(columns, grid, limit) {
+        const cap = limit || 240;
+        const stride = Math.max(1, Math.ceil(columns.length / cap));
+        const out = [];
+        for (let i = 0; i < columns.length; i += stride) {
+            const col = columns[i];
+            out.push({
+                t: col.t,
+                bb: col.bestBid,
+                ba: col.bestAsk,
+                last: col.last,
+                bids: packSide(col.bids, grid),
+                asks: packSide(col.asks, grid),
+            });
+        }
+        return { v: 1, columns: out };
+    }
+
+    function paintPacked(levels, dest, grid) {
+        if (!levels) return;
+        for (let i = 0; i < levels.length; i++) {
+            const row = Math.floor((levels[i][0] - grid.low) / grid.bin);
+            if (row < 0 || row >= dest.length) continue;
+            if (levels[i][1] > dest[row]) dest[row] = levels[i][1];
+        }
+    }
+
+    function unpackHistory(packed, grid) {
+        if (!packed || !packed.columns || !grid) return [];
+        const cols = [];
+        for (let i = 0; i < packed.columns.length; i++) {
+            const raw = packed.columns[i];
+            const bids = new Float32Array(grid.rows);
+            const asks = new Float32Array(grid.rows);
+            paintPacked(raw.bids, bids, grid);
+            paintPacked(raw.asks, asks, grid);
+            cols.push({
+                t: raw.t,
+                bids: bids,
+                asks: asks,
+                bestBid: raw.bb,
+                bestAsk: raw.ba,
+                last: raw.last,
+            });
+        }
+        return cols;
+    }
+
+    function saveHistory(state) {
+        if (typeof sessionStorage === "undefined" || !state.grid || !state.columns.length) return;
+        function write(limit) {
+            sessionStorage.setItem("liquidity-book-v1", JSON.stringify(packHistory(state.columns, state.grid, limit)));
+        }
+        try { write(240); }
+        catch (error) {
+            try { write(60); }
+            catch (again) { /* quota */ }
+        }
+    }
+
+    function parseWire(text) {
+        const tokens = [];
+        const replaced = String(text).replace(/"(?:\\.|[^"\\])*"|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g, function (tok) {
+            if (tok[0] === "\"") return tok;
+            const id = tokens.length;
+            tokens.push(tok);
+            return "\"__WIRE_" + id + "__\"";
+        });
+        const parsed = JSON.parse(replaced);
+        function revive(node) {
+            if (Array.isArray(node)) return node.map(revive);
+            if (node && typeof node === "object") {
+                const out = {};
+                const keys = Object.keys(node);
+                for (let i = 0; i < keys.length; i++) out[keys[i]] = revive(node[keys[i]]);
+                return out;
+            }
+            if (typeof node === "string") {
+                const match = /^__WIRE_(\d+)__$/.exec(node);
+                if (match) return tokens[Number(match[1])];
+            }
+            return node;
+        }
+        return revive(parsed);
+    }
+
+    function wireToken(value) {
+        const stripped = String(value).replace(".", "").replace(/^0+/, "");
+        return stripped === "" ? "0" : stripped;
+    }
+
+    function crc32(str) {
+        if (!crc32.table) {
+            const table = new Uint32Array(256);
+            for (let n = 0; n < 256; n++) {
+                let c = n;
+                for (let k = 0; k < 8; k++) c = c & 1 ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+                table[n] = c >>> 0;
+            }
+            crc32.table = table;
+        }
+        let crc = 0xffffffff;
+        for (let i = 0; i < str.length; i++) crc = crc32.table[(crc ^ str.charCodeAt(i)) & 255] ^ (crc >>> 8);
+        return (crc ^ 0xffffffff) >>> 0;
+    }
+
+    function checksumSides(bids, asks) {
+        const askPrices = Object.keys(asks).sort(function (a, b) { return Number(a) - Number(b); }).slice(0, 10);
+        const bidPrices = Object.keys(bids).sort(function (a, b) { return Number(b) - Number(a); }).slice(0, 10);
+        let body = "";
+        for (let i = 0; i < askPrices.length; i++) body += wireToken(askPrices[i]) + wireToken(asks[askPrices[i]]);
+        for (let i = 0; i < bidPrices.length; i++) body += wireToken(bidPrices[i]) + wireToken(bids[bidPrices[i]]);
+        return crc32(body);
+    }
+
+    function applyWireLevels(map, levels) {
+        if (!levels) return;
+        for (let i = 0; i < levels.length; i++) {
+            const level = levels[i];
+            const price = Array.isArray(level) ? String(level[0]) : String(level.price);
+            const qty = Array.isArray(level) ? String(level[1]) : String(level.qty);
+            if (!price || price === "undefined") continue;
+            if (Number(qty) <= 0) delete map[price];
+            else map[price] = qty;
+        }
+    }
+
+    function truncateWire(map, depth, descending) {
+        const prices = Object.keys(map).sort(function (a, b) {
+            return descending ? Number(b) - Number(a) : Number(a) - Number(b);
+        });
+        const next = {};
+        for (let i = 0; i < prices.length && i < depth; i++) next[prices[i]] = map[prices[i]];
+        return next;
+    }
+
+    function rebuildNumeric(book) {
+        book.bids = new Map();
+        book.asks = new Map();
+        const bidPrices = Object.keys(book.wireBids || {});
+        for (let i = 0; i < bidPrices.length; i++) book.bids.set(Number(bidPrices[i]), Number(book.wireBids[bidPrices[i]]));
+        const askPrices = Object.keys(book.wireAsks || {});
+        for (let i = 0; i < askPrices.length; i++) book.asks.set(Number(askPrices[i]), Number(book.wireAsks[askPrices[i]]));
+    }
+
+    function applyWireBook(book, type, row) {
+        const nextBids = type === "snapshot" ? {} : Object.assign({}, book.wireBids || {});
+        const nextAsks = type === "snapshot" ? {} : Object.assign({}, book.wireAsks || {});
+        applyWireLevels(nextBids, row && row.bids);
+        applyWireLevels(nextAsks, row && row.asks);
+        if (row && row.checksum != null && checksumSides(nextBids, nextAsks) !== Number(row.checksum)) {
+            return { ok: false, resubscribe: true };
+        }
+        book.wireBids = truncateWire(nextBids, book.depth, true);
+        book.wireAsks = truncateWire(nextAsks, book.depth, false);
+        rebuildNumeric(book);
+        return { ok: true, resubscribe: false };
     }
 
     function newestPrice(trades) {
@@ -1284,6 +1811,26 @@ function pruneTrades(tape, cutoff) {
         hoverText: hoverText,
         prejudge: prejudge,
         publishCall: publishCall,
+        publishStall: publishStall,
+        currentCall: currentCall,
+        onOhlc: onOhlc,
+        stallNote: stallNote,
+        bannerReady: bannerReady,
+        afterCandleFailure: afterCandleFailure,
+        sessionOpen: sessionOpen,
+        phoenixMidnightMs: phoenixMidnightMs,
+        candleFromOhlc: candleFromOhlc,
+        mergeCandle: mergeCandle,
+        enoughCandles: enoughCandles,
+        timeTickPlan: timeTickPlan,
+        wallPick: wallPick,
+        wallRead: wallRead,
+        rememberSize: rememberSize,
+        packHistory: packHistory,
+        unpackHistory: unpackHistory,
+        parseWire: parseWire,
+        applyWireBook: applyWireBook,
+        checksumSides: checksumSides,
         setDeskView: setDeskView,
         prepare: prepare,
         mount: mount,
