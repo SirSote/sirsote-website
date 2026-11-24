@@ -39,7 +39,7 @@ header {
 h1 {
     margin: 0;
     font-size: 1.4rem;
-    font-weight: 500;
+    font-weight: 700;
 }
 
 main {
@@ -59,11 +59,92 @@ main {
 }
 
 .sheet {
-    white-space: pre-wrap;
     font-family: "JetBrains Mono", monospace;
-    font-size: 0.92rem;
+    font-size: 1rem;
+    font-weight: 600;
     line-height: 1.55;
 }
+
+.sheet-kicker {
+    margin: 0 0 0.9rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.sheet-kicker strong {
+    color: var(--text);
+    font-weight: 700;
+}
+
+.lines {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+}
+
+.lines div {
+    display: grid;
+    grid-template-columns: 5.2rem 1fr;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.lines dt {
+    margin: 0;
+    color: var(--muted);
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.lines dd {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.call {
+    font-weight: 700;
+    padding: 0.08rem 0.4rem;
+    border-radius: 4px;
+}
+
+.call.long { color: #04140c; background: #00ff88; }
+.call.short { color: #fff; background: #ff3366; }
+.call.wait { color: #1a1400; background: #f5c542; }
+.call.aside { color: #f4f4f4; background: #3a3a3a; }
+
+.price {
+    color: #fff;
+    font-weight: 700;
+}
+
+.level { color: #f5c542; font-weight: 700; }
+
+.why {
+    margin: 0.95rem 0 0;
+    font-size: 1.02rem;
+    font-weight: 600;
+}
+
+.since,
+.fine,
+.caption {
+    margin: 0.7rem 0 0;
+    color: var(--muted);
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.fine a { color: #00ff88; font-weight: 700; }
+
+.verdict { margin: 0.7rem 0 0; font-weight: 700; }
+.verdict.make { color: #00ff88; }
+.verdict.break { color: #ff3366; }
 
 img {
     display: block;
