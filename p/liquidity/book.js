@@ -20,7 +20,7 @@
     const BIN = 1;
     const STORE_HALF = 800;
     const PRICE_WINDOW = { tight: 60, near: 200, wide: 500, far: 1000 };
-    const TZ = "America/Phoenix";
+    const TZ = "America/New_York";
     const PAIR = "BTC/USD";
     let latestCall = null;
     let latestStall = "";
@@ -1380,25 +1380,28 @@ function pruneTrades(tape, cutoff) {
         return { call: call, stall: stallNote(!!call) };
     }
 
-    function phoenixMidnightMs(now) {
+    function exchangeMidnightMs(now) {
+        const stamp = new Date(now);
         const parts = new Intl.DateTimeFormat("en-US", {
             timeZone: TZ,
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-        }).formatToParts(new Date(now));
+            hourCycle: "h23",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+        }).formatToParts(stamp);
         function pick(type) {
             for (let i = 0; i < parts.length; i++) {
                 if (parts[i].type === type) return Number(parts[i].value);
             }
-            return NaN;
+            return 0;
         }
-        return Date.UTC(pick("year"), pick("month") - 1, pick("day"), 7, 0, 0);
+        const elapsed = ((pick("hour") * 60 + pick("minute")) * 60 + pick("second")) * 1000 + stamp.getMilliseconds();
+        return stamp.getTime() - elapsed;
     }
 
     function sessionOpen(candles, now) {
         if (!candles || !candles.length) return null;
-        const start = Math.floor(phoenixMidnightMs(now) / 1000);
+        const start = Math.floor(exchangeMidnightMs(now) / 1000);
         for (let i = 0; i < candles.length; i++) {
             if (candles[i].time === start) return candles[i].open;
         }
@@ -1818,7 +1821,7 @@ function pruneTrades(tape, cutoff) {
         bannerReady: bannerReady,
         afterCandleFailure: afterCandleFailure,
         sessionOpen: sessionOpen,
-        phoenixMidnightMs: phoenixMidnightMs,
+        exchangeMidnightMs: exchangeMidnightMs,
         candleFromOhlc: candleFromOhlc,
         mergeCandle: mergeCandle,
         enoughCandles: enoughCandles,

@@ -20,7 +20,7 @@
     const RSI_LONG = [40, 50];
     const RSI_SHORT = [50, 60];
     const STOP_ATR = 1.5;
-    const TZ = "America/Phoenix";
+    const TZ = "America/New_York";
 
     const DAY_FAST = 21;
     const DAY_SLOW = 200;

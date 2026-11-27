@@ -250,10 +250,10 @@ assert.strictEqual(replaced[0].close, 3);
 const longer = book.mergeCandle(replaced, { time: 5, open: 1, high: 1, low: 1, close: 1 });
 assert.strictEqual(longer[0].time, 5);
 assert.strictEqual(book.enoughCandles(longer, longer), false);
-const phoenixNoon = Date.UTC(2026, 10, 21, 20, 0, 0);
-const phoenixOpen = book.phoenixMidnightMs(phoenixNoon);
-assert.strictEqual(phoenixOpen, Date.UTC(2026, 10, 21, 7, 0, 0));
-assert.strictEqual(book.sessionOpen([{ time: phoenixOpen / 1000, open: 60000 }], phoenixNoon), 60000);
+const exchangeNoon = Date.UTC(2026, 10, 21, 20, 0, 0);
+const exchangeOpen = book.exchangeMidnightMs(exchangeNoon);
+assert.strictEqual(exchangeOpen, Date.UTC(2026, 10, 21, 5, 0, 0));
+assert.strictEqual(book.sessionOpen([{ time: exchangeOpen / 1000, open: 60000 }], exchangeNoon), 60000);
 const wireCandle = book.candleFromOhlc({
     interval: "60",
     interval_begin: "2026-11-21T16:00:00.000000000Z",
