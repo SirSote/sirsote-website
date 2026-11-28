@@ -215,17 +215,16 @@
             reward2r: null,
         };
         if (snap.h1Adx == null || snap.h1Adx <= ADX_MIN) {
-            const shown = snap.h1Adx == null ? "unread" : snap.h1Adx.toFixed(1);
-            const leanText = lean === "RANGE" ? "either way" : lean.toLowerCase();
+            const leanWord = lean === "LONG" ? "up" : lean === "SHORT" ? "down" : "either way";
             return Object.assign({}, base, {
                 call: "STAND ASIDE",
-                why: "1h ADX is " + shown + ", under 25. The 4h averages lean " + leanText + ", but the hour is too sideways to trade.",
+                why: "The last hour is too flat to trade. The bigger picture leans " + leanWord + ", so stand aside until the move is clearer.",
             });
         }
         if (trend === "RANGE") {
             return Object.assign({}, base, {
                 call: "STAND ASIDE",
-                why: "4h EMA21 and EMA55 are tied. There is no direction to trade.",
+                why: "The bigger trend is flat. There is no clear up or down, so stand aside.",
             });
         }
         const bullish = snap.h1Close > snap.h1Open;
@@ -236,26 +235,26 @@
             if (band && bullish && volumeOk) {
                 return Object.assign({}, base, levels("LONG", snap.price, snap.h1Atr), {
                     call: "LONG",
-                    why: "4h EMA21 is above EMA55 and 1h ADX is " + snap.h1Adx.toFixed(1) + ". RSI reset into 40–50 and the hour closed up on above-average volume. Stop is 1.5×ATR. Size it so that distance is 1% of the account.",
+                    why: "The bigger trend is up. Price dipped, then the last hour closed higher on busy trading. Put the stop a short distance under the price, and risk only 1% of the account.",
                 });
             }
             let why;
-            if (!band) why = "4h is up and 1h ADX is " + snap.h1Adx.toFixed(1) + ". RSI is " + snap.h1Rsi.toFixed(1) + ", outside the 40–50 pullback.";
-            else if (!bullish) why = "RSI is in the 40–50 pullback, but the hour has not closed up.";
-            else why = "RSI reset into 40–50, but volume is under its 20-hour average.";
+            if (!band) why = "The bigger trend is up. Price has not dipped into the buy zone yet (40–50), so wait.";
+            else if (!bullish) why = "Price dipped into the buy zone, but the last hour did not close higher. Wait for that higher close.";
+            else why = "Price dipped into the buy zone, but that hour was quiet. Wait for a busier hour.";
             return Object.assign({}, base, { call: "WAIT", why: why });
         }
         const band = inBand(snap.h1Rsi, RSI_SHORT);
         if (band && bearish && volumeOk) {
             return Object.assign({}, base, levels("SHORT", snap.price, snap.h1Atr), {
                 call: "SHORT",
-                why: "4h EMA21 is below EMA55 and 1h ADX is " + snap.h1Adx.toFixed(1) + ". RSI reset into 50–60 and the hour closed down on above-average volume. Stop is 1.5×ATR. Size it so that distance is 1% of the account.",
+                why: "The bigger trend is down. Price bounced, then the last hour closed lower on busy trading. Put the stop a short distance above the price, and risk only 1% of the account.",
             });
         }
         let why;
-        if (!band) why = "4h is down and 1h ADX is " + snap.h1Adx.toFixed(1) + ". RSI is " + snap.h1Rsi.toFixed(1) + ", outside the 50–60 bounce.";
-        else if (!bearish) why = "RSI is in the 50–60 bounce, but the hour has not closed down.";
-        else why = "RSI reset into 50–60, but volume is under its 20-hour average.";
+        if (!band) why = "The bigger trend is down. Price has not bounced into the sell zone yet, so wait.";
+        else if (!bearish) why = "Price bounced into the sell zone, but the last hour has not closed down. Wait for that lower close.";
+        else why = "Price bounced into the sell zone, but that hour was quiet. Wait for a busier hour.";
         return Object.assign({}, base, { call: "WAIT", why: why });
     }
 
